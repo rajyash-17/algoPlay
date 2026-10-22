@@ -54,21 +54,13 @@ export function executeTrace({
     };
 
     // 5. Build function runner
+    const fnMatch = code.match(/function\s+([a-zA-Z0-9_$]+)\s*\(/);
+    const targetFn = entryFunction || (fnMatch ? fnMatch[1] : 'solution');
+
     const wrappedCode = `
       ${instrumented}
-      if (typeof ${entryFunction || 'solution'} === 'function') {
-        return (${entryFunction || 'solution'}).apply(null, __args);
-      } else {
-        const declaredFns = [
-          typeof twoSum === 'function' ? twoSum : null,
-          typeof twoSumII === 'function' ? twoSumII : null,
-          typeof isPalindrome === 'function' ? isPalindrome : null,
-          typeof maxProfit === 'function' ? maxProfit : null,
-          typeof searchInsert === 'function' ? searchInsert : null,
-        ].filter(Boolean);
-        if (declaredFns.length > 0) {
-          return declaredFns[0].apply(null, __args);
-        }
+      if (typeof ${targetFn} === 'function') {
+        return (${targetFn}).apply(null, __args);
       }
       return undefined;
     `;
