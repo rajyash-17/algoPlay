@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Step, RendererConfig, TreeStructureSnapshot, TreeNodeSnapshot, Highlight } from '@/engine/types';
-import { Layers, Activity, CheckCircle2, GitBranch, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Layers, Activity, CheckCircle2, GitBranch, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface TreeRendererProps {
   step: Step | null;
@@ -19,35 +19,22 @@ interface LayoutNode {
   rightId: string | null;
 }
 
-export const TreeRenderer: React.FC<TreeRendererProps> = ({ step, config }) => {
+interface TreeCanvasProps {
+  step: Step;
+  treeStructure: TreeStructureSnapshot;
+  config: RendererConfig;
+}
+
+const TreeCanvas: React.FC<TreeCanvasProps> = ({ step, treeStructure, config }) => {
   const [zoom, setZoom] = useState<number>(1);
 
-  if (!step) {
-    return (
-      <div className="flex items-center justify-center h-80 border-3 border-dashed border-ink rounded-lg bg-surface-muted text-ink-muted font-mono font-bold">
-        Ready to trace binary tree...
-      </div>
-    );
-  }
-
-  // Find target tree structure
-  const treeStructure = (step.structures.find(
-    (s) => s.name === config.primaryStructure && s.type === 'tree'
-  ) || step.structures.find((s) => s.type === 'tree')) as TreeStructureSnapshot | undefined;
-
-  if (!treeStructure || treeStructure.nodes.length === 0 || !treeStructure.rootId) {
-    return (
-      <div className="flex flex-col items-center justify-center h-80 border-3 border-ink rounded-lg bg-surface-muted text-ink-muted font-mono p-6 shadow-standard">
-        <span className="font-bold text-ink text-lg">Empty Tree</span>
-        <span className="text-xs text-ink-subtle mt-1 font-mono">root = null</span>
-      </div>
-    );
-  }
-
   const nodes = treeStructure.nodes;
-  const rootId = treeStructure.rootId;
+  const rootId = treeStructure.rootId!;
   const highlights = step.highlights;
-  const visitedSet = useMemo(() => new Set(treeStructure.visitedIds ?? []), [treeStructure.visitedIds]);
+
+  const visitedSet = useMemo(() => {
+    return new Set(treeStructure.visitedIds ?? []);
+  }, [treeStructure.visitedIds]);
 
   // Map pointer highlights by nodeId
   const pointersByNodeId = useMemo(() => {
@@ -62,7 +49,7 @@ export const TreeRenderer: React.FC<TreeRendererProps> = ({ step, config }) => {
     return map;
   }, [highlights]);
 
-  // Detect traversal output array in step.vars (e.g. res, result, ans, order, averages)
+  // Detect traversal output array in step.vars (e.g. res, result, ans, order, output, vals, averages)
   const traversalResult = useMemo(() => {
     for (const [key, val] of Object.entries(step.vars)) {
       if (
@@ -113,7 +100,7 @@ export const TreeRenderer: React.FC<TreeRendererProps> = ({ step, config }) => {
     const pMap: Map<string, string> = new Map<string, string>(); // childId -> parentId
     const LEVEL_HEIGHT = 85;
     const X_SPACING = 80;
-    const START_X = 120; // Generous 120px left margin ensures pills and badges are never clipped
+    const START_X = 120; // 120px left margin ensures pills and badges are never clipped
     const START_Y = 65;
     let nextX = 0;
 
@@ -510,4 +497,30 @@ export const TreeRenderer: React.FC<TreeRendererProps> = ({ step, config }) => {
       </div>
     </div>
   );
+};
+
+export const TreeRenderer: React.FC<TreeRendererProps> = ({ step, config }) => {
+  if (!step) {
+    return (
+      <div className="flex items-center justify-center h-80 border-3 border-dashed border-ink rounded-lg bg-surface-muted text-ink-muted font-mono font-bold">
+        Ready to trace binary tree...
+      </div>
+    );
+  }
+
+  // Find target tree structure
+  const treeStructure = (step.structures.find(
+    (s) => s.name === config.primaryStructure && s.type === 'tree'
+  ) || step.structures.find((s) => s.type === 'tree')) as TreeStructureSnapshot | undefined;
+
+  if (!treeStructure || treeStructure.nodes.length === 0 || !treeStructure.rootId) {
+    return (
+      <div className="flex flex-col items-center justify-center h-80 border-3 border-ink rounded-lg bg-surface-muted text-ink-muted font-mono p-6 shadow-standard">
+        <span className="font-bold text-ink text-lg">Empty Tree</span>
+        <span className="text-xs text-ink-subtle mt-1 font-mono">root = null</span>
+      </div>
+    );
+  }
+
+  return <TreeCanvas step={step} treeStructure={treeStructure} config={config} />;
 };
