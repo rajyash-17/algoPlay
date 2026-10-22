@@ -1,11 +1,40 @@
-import React from 'react';
+'use client';
+
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { getAllProblems } from '@/problems';
-import { ArrowRight, Code2, Compass } from 'lucide-react';
+import { ArrowRight, Code2, Compass, Layers, GitBranch, Terminal, Trophy } from 'lucide-react';
 import { tokens } from '@/lib/tokens';
 
 export default function HomePage() {
   const problems = getAllProblems();
+
+  // Group problems by category
+  const problemsByCategory = useMemo(() => {
+    const map = new Map<string, typeof problems>();
+    for (const p of problems) {
+      const cat = p.meta.category || 'General';
+      const list = map.get(cat) ?? [];
+      list.push(p);
+      map.set(cat, list);
+    }
+    return Array.from(map.entries());
+  }, [problems]);
+
+  const getCategoryIcon = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'stack':
+        return <Layers className="w-5 h-5" />;
+      case 'linked list':
+        return <GitBranch className="w-5 h-5" />;
+      case 'binary tree':
+      case 'binary tree bfs':
+      case 'binary search tree':
+        return <Terminal className="w-5 h-5" />;
+      default:
+        return <Code2 className="w-5 h-5" />;
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto w-full px-4 py-8 flex flex-col gap-8">
@@ -14,14 +43,14 @@ export default function HomePage() {
         <div className="flex flex-col gap-2 max-w-2xl z-10">
           <div className="inline-flex items-center gap-2 bg-accent/40 border border-ink px-3 py-1 rounded w-fit font-mono text-xs font-bold text-ink">
             <Compass className="w-3.5 h-3.5" />
-            PHASE 1: ARRAY & POINTER TRACING
+            PHASE 2: GRAPHS, TREES, STACKS & QUEUES
           </div>
           <h1 className="text-3xl sm:text-5xl font-black font-mono tracking-tight text-ink">
             Watch Code Think.
           </h1>
           <p className="text-ink-muted text-base sm:text-lg font-medium leading-relaxed">
-            Step through LeetCode solutions frame-by-frame with deterministic snapshots,
-            animated pointers, and synchronized line highlighting.
+            Step through LeetCode Top Interview 150 solutions frame-by-frame with deterministic snapshots,
+            animated pointer badges, and synchronized multi-language line highlighting.
           </p>
         </div>
 
@@ -33,65 +62,91 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Problem Cards Grid */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-mono font-black text-ink flex items-center gap-2">
-            <Code2 className="w-5 h-5" />
-            LeetCode Top Interview 150
-          </h2>
-          <span className="font-mono text-xs font-bold text-ink-muted">
-            5 problems loaded
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {problems.map((problem) => {
-            const { meta } = problem;
-            const diffStyle = tokens.colors.difficulty[meta.difficulty];
-
-            return (
-              <Link
-                key={meta.slug}
-                href={`/problems/${meta.slug}`}
-                className="group flex flex-col justify-between bg-surface border-3 border-ink rounded-xl shadow-standard hover:shadow-large hover:-translate-y-1 transition-all p-5"
-              >
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-mono text-xs font-bold text-ink-muted">
-                      #{meta.number}
-                    </span>
-                    <span
-                      style={{ backgroundColor: diffStyle.bg, color: diffStyle.text }}
-                      className="font-mono text-xs font-black px-2.5 py-0.5 rounded border border-ink shadow-sm"
-                    >
-                      {meta.difficulty}
+      {/* Categorized Problem Sections */}
+      <div className="flex flex-col gap-10">
+        {problemsByCategory.map(([category, catProblems], catIdx) => {
+          return (
+            <div key={category} className="flex flex-col gap-4">
+              {/* Category Header with Arcade Badges */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b-3 border-ink">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 bg-canvas border-2 border-ink rounded shadow-sm text-ink">
+                    {getCategoryIcon(category)}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-mono font-black text-ink">
+                      {category}
+                    </h2>
+                    <span className="font-mono text-xs text-ink-muted font-bold">
+                      {catProblems.length} {catProblems.length === 1 ? 'problem' : 'problems'}
                     </span>
                   </div>
-
-                  <h3 className="font-mono text-lg font-black text-ink group-hover:text-primary-hover transition-colors">
-                    {meta.title}
-                  </h3>
-
-                  <p className="text-ink-muted text-xs line-clamp-2 leading-relaxed">
-                    {meta.description ?? 'Interactive step-by-step algorithmic visualization.'}
-                  </p>
                 </div>
 
-                <div className="mt-5 pt-3 border-t-2 border-surface-muted flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold bg-surface-muted text-ink px-2 py-0.5 rounded border border-ink/30">
-                    {meta.pattern}
-                  </span>
-
-                  <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-ink group-hover:translate-x-1 transition-transform">
-                    Simulate
-                    <ArrowRight className="w-3.5 h-3.5" />
+                {/* Arcade Level & Progress Badge */}
+                <div className="flex items-center gap-2 bg-surface px-3 py-1.5 border-2 border-ink rounded shadow-sm font-mono text-xs font-bold">
+                  <div className="flex items-center gap-1 text-ink">
+                    <Trophy className="w-3.5 h-3.5 text-warning fill-warning" />
+                    <span>TIER {catIdx + 1}</span>
+                  </div>
+                  <span className="text-ink-subtle">|</span>
+                  <span className="bg-primary px-1.5 py-0.5 rounded border border-ink text-ink text-[10px] font-black">
+                    {catProblems.length} / {catProblems.length} UNLOCKED
                   </span>
                 </div>
-              </Link>
-            );
-          })}
-        </div>
+              </div>
+
+              {/* Problem Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {catProblems.map((problem) => {
+                  const { meta } = problem;
+                  const diffStyle = tokens.colors.difficulty[meta.difficulty];
+
+                  return (
+                    <Link
+                      key={meta.slug}
+                      href={`/problems/${meta.slug}`}
+                      className="group flex flex-col justify-between bg-surface border-3 border-ink rounded-xl shadow-standard hover:shadow-large hover:-translate-y-1 transition-all p-5"
+                    >
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-mono text-xs font-bold text-ink-muted">
+                            #{meta.number}
+                          </span>
+                          <span
+                            style={{ backgroundColor: diffStyle.bg, color: diffStyle.text }}
+                            className="font-mono text-xs font-black px-2.5 py-0.5 rounded border border-ink shadow-sm"
+                          >
+                            {meta.difficulty}
+                          </span>
+                        </div>
+
+                        <h3 className="font-mono text-lg font-black text-ink group-hover:text-primary-hover transition-colors">
+                          {meta.title}
+                        </h3>
+
+                        <p className="text-ink-muted text-xs line-clamp-2 leading-relaxed">
+                          {meta.description ?? 'Interactive step-by-step algorithmic visualization.'}
+                        </p>
+                      </div>
+
+                      <div className="mt-5 pt-3 border-t-2 border-surface-muted flex items-center justify-between">
+                        <span className="font-mono text-xs font-bold bg-surface-muted text-ink px-2 py-0.5 rounded border border-ink/30">
+                          {meta.pattern}
+                        </span>
+
+                        <span className="inline-flex items-center gap-1 font-mono text-xs font-bold text-ink group-hover:translate-x-1 transition-transform">
+                          Simulate
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
