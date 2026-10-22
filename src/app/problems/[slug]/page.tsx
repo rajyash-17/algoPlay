@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { getProblemBySlug, ProblemDefinition } from '@/problems';
 import { usePlayerStore } from '@/lib/playerStore';
 import { runTrace } from '@/engine/run';
-import { ArrayRenderer } from '@/renderers/ArrayRenderer';
+import { RendererHost } from '@/renderers/RendererHost';
 import { CodePanel } from '@/components/player/CodePanel';
 import { CaptionBar } from '@/components/player/CaptionBar';
 import { PlayerControls } from '@/components/player/PlayerControls';
@@ -186,7 +186,7 @@ export default function ProblemPage() {
         <div className="lg:col-span-7 flex flex-col gap-4">
           {/* Active Data Structure Renderer */}
           <div className="flex-1 flex flex-col">
-            <ArrayRenderer step={currentStep} config={rendererConfig} />
+            <RendererHost step={currentStep} config={rendererConfig} />
           </div>
 
           {/* Step Narrative Caption */}
