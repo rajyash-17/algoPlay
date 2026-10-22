@@ -69,6 +69,9 @@ export function instrumentCode(sourceCode: string, options: InstrumentOptions = 
   traverse(ast, {
     Function(path) {
       if (!options.wrapParams) return;
+      if ((path.node as unknown as InjectedNode)._injected) return;
+      (path.node as unknown as InjectedNode)._injected = true;
+
       if (!t.isBlockStatement(path.node.body)) {
         // Arrow function with concise body: () => expr -> () => { return expr; }
         const returnStmt = t.returnStatement(path.node.body as t.Expression);
@@ -78,9 +81,21 @@ export function instrumentCode(sourceCode: string, options: InstrumentOptions = 
       const blockBody = path.node.body as t.BlockStatement;
       const paramWrappingStmts: t.Statement[] = [];
 
+      // Extract function name
+      let funcName = 'fn';
+      if ('id' in path.node && path.node.id && t.isIdentifier(path.node.id)) {
+        funcName = path.node.id.name;
+      } else if (path.parent && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
+        funcName = path.parent.id.name;
+      }
+
+      const paramProps: t.ObjectProperty[] = [];
+
       for (const param of path.node.params) {
         if (t.isIdentifier(param)) {
           const paramName = param.name;
+          paramProps.push(t.objectProperty(t.identifier(paramName), t.identifier(paramName)));
+
           // param = __wrapArray(param, 'param');
           const wrapCall = t.expressionStatement(
             t.assignmentExpression(
@@ -94,12 +109,40 @@ export function instrumentCode(sourceCode: string, options: InstrumentOptions = 
           );
           (wrapCall as unknown as InjectedNode)._injected = true;
           paramWrappingStmts.push(wrapCall);
+
+          // Track parameter initial value in currentVars
+          const assignCall = t.expressionStatement(
+            t.callExpression(t.identifier('__assign'), [
+              t.stringLiteral(paramName),
+              t.identifier(paramName),
+            ])
+          );
+          (assignCall as unknown as InjectedNode)._injected = true;
+          paramWrappingStmts.push(assignCall);
         }
       }
 
-      if (paramWrappingStmts.length > 0) {
-        blockBody.body.unshift(...paramWrappingStmts);
-      }
+      const enterCall = t.expressionStatement(
+        t.callExpression(t.identifier('__enter'), [
+          t.stringLiteral(funcName),
+          t.objectExpression(paramProps),
+        ])
+      );
+      (enterCall as unknown as InjectedNode)._injected = true;
+
+      const exitCall = t.expressionStatement(
+        t.callExpression(t.identifier('__exit'), [t.stringLiteral(funcName)])
+      );
+      (exitCall as unknown as InjectedNode)._injected = true;
+
+      const tryFinally = t.tryStatement(
+        t.blockStatement([...blockBody.body]),
+        null,
+        t.blockStatement([exitCall])
+      );
+      (tryFinally as unknown as InjectedNode)._injected = true;
+
+      blockBody.body = [enterCall, ...paramWrappingStmts, tryFinally];
     },
     ArrayExpression(path) {
       const parent = path.parent;

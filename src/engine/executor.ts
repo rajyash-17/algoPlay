@@ -36,6 +36,8 @@ export function executeTrace({
       __line: (line: number) => tracer.onLine(line),
       __assign: (name: string, val: unknown) => tracer.onAssign(name, val),
       __wrapArray: (arr: unknown, name: string) => tracer.wrapArray(arr, name),
+      __enter: (name: string, params: Record<string, unknown>) => tracer.onEnter(name, params),
+      __exit: (name?: string) => tracer.onExit(name),
       note: (text: string) => tracer.note(text),
     };
 
@@ -70,6 +72,8 @@ export function executeTrace({
       '__line',
       '__assign',
       '__wrapArray',
+      '__enter',
+      '__exit',
       'note',
       '__args',
       wrappedCode
@@ -79,6 +83,8 @@ export function executeTrace({
       tracerEnv.__line,
       tracerEnv.__assign,
       tracerEnv.__wrapArray,
+      tracerEnv.__enter,
+      tracerEnv.__exit,
       tracerEnv.note,
       args
     );

@@ -20,10 +20,58 @@ export class Tracer {
   private stepCount: number = 0;
   private rendererConfig?: RendererConfig;
   private nodeRegistry: NodeIdRegistry = new NodeIdRegistry();
+  private visitedNodeIds: Set<string> = new Set();
+  private scopeStack: Array<{
+    funcName: string;
+    savedParams: Map<string, unknown>;
+    argsSnapshot: Record<string, Snapshot>;
+  }> = [];
 
   constructor(rendererConfig?: RendererConfig, traceConfig?: TraceConfig) {
     this.rendererConfig = rendererConfig;
     this.maxSteps = traceConfig?.maxSteps ?? 5000;
+  }
+
+  /**
+   * Called by instrumented code when entering a function scope
+   */
+  public onEnter(funcName: string, params: Record<string, unknown>): void {
+    const savedParams = new Map<string, unknown>();
+    const argsSnapshot: Record<string, Snapshot> = {};
+
+    for (const [key, value] of Object.entries(params)) {
+      if (this.currentVars.has(key)) {
+        savedParams.set(key, this.currentVars.get(key));
+      }
+      this.currentVars.set(key, value);
+      argsSnapshot[key] = createSnapshot(value);
+
+      // Register initial tree structure reference if not already present
+      if (value && typeof value === 'object' && ('left' in value || 'right' in value)) {
+        if (!this.trackedStructures.has(key)) {
+          this.trackedStructures.set(key, value);
+        }
+      }
+    }
+
+    this.scopeStack.push({
+      funcName,
+      savedParams,
+      argsSnapshot,
+    });
+  }
+
+  /**
+   * Called by instrumented code when exiting a function scope
+   */
+  public onExit(_funcName?: string): void {
+    const frame = this.scopeStack.pop();
+    if (!frame) return;
+
+    // Restore the parameter state of caller's frame
+    for (const [key, prevVal] of frame.savedParams.entries()) {
+      this.currentVars.set(key, prevVal);
+    }
   }
 
   /**
@@ -49,7 +97,13 @@ export class Tracer {
       Array.isArray(value) ||
       (value && typeof value === 'object' && ('__rawTarget' in value || 'next' in value || 'left' in value || 'right' in value))
     ) {
-      this.trackedStructures.set(name, value);
+      const existing = this.trackedStructures.get(name);
+      // For tree structures, retain the ancestor root so the full tree layout is preserved
+      if (existing && typeof existing === 'object' && ('left' in existing || 'right' in existing)) {
+        // Keep existing tree root as structure container
+      } else {
+        this.trackedStructures.set(name, value);
+      }
     }
   }
 
@@ -72,7 +126,10 @@ export class Tracer {
    */
   public wrapArray<T extends unknown[]>(arr: unknown, name: string): unknown {
     if (arr && typeof arr === 'object') {
-      this.trackedStructures.set(name, arr);
+      const existing = this.trackedStructures.get(name);
+      if (!existing || (existing && typeof existing === 'object' && !('left' in existing || 'right' in existing))) {
+        this.trackedStructures.set(name, arr);
+      }
     }
 
     if (!Array.isArray(arr)) {
@@ -172,6 +229,9 @@ export class Tracer {
         const raw = this.trackedStructures.get(structDef.name) ?? this.currentVars.get(structDef.name);
         const snapshot = extractStructureSnapshot(structDef.name, raw, structDef.type, this.nodeRegistry);
         if (snapshot) {
+          if (snapshot.type === 'tree') {
+            snapshot.visitedIds = Array.from(this.visitedNodeIds);
+          }
           structures.push(snapshot);
         }
       }
@@ -214,6 +274,7 @@ export class Tracer {
         else if (varVal && typeof varVal === 'object') {
           const stableNodeId = this.nodeRegistry.getExistingId(varVal);
           if (stableNodeId) {
+            this.visitedNodeIds.add(stableNodeId);
             highlights.push({
               target,
               nodeId: stableNodeId,
@@ -234,6 +295,11 @@ export class Tracer {
       structures,
       highlights,
       note: this.pendingNote,
+      callStack: this.scopeStack.map((f) => ({
+        functionName: f.funcName,
+        args: f.argsSnapshot,
+        line: this.currentLine,
+      })),
     };
 
     this.pendingNote = undefined;
