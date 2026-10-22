@@ -12,6 +12,7 @@ import { CaptionBar } from '@/components/player/CaptionBar';
 import { PlayerControls } from '@/components/player/PlayerControls';
 import { ArrowLeft, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, BookOpen, Columns, Expand, Maximize2, Minimize2 } from 'lucide-react';
 import { tokens } from '@/lib/tokens';
+import { formatReturnValue } from '@/lib/formatValue';
 
 export default function ProblemPage() {
   const params = useParams();
@@ -259,7 +260,7 @@ export default function ProblemPage() {
                 </span>
               </div>
               <code className="font-mono text-sm font-black bg-surface px-2.5 py-1 rounded border-2 border-ink shadow-sm">
-                {JSON.stringify(traceResult.returnValue)}
+                {formatReturnValue(traceResult.returnValue)}
               </code>
             </div>
           )}
