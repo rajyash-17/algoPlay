@@ -17,32 +17,46 @@ export const CodePanel: React.FC<CodePanelProps> = ({ rawCode, currentLine, slug
   const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('JavaScript');
   const activeLineRef = useRef<HTMLDivElement | null>(null);
 
-  // Strip emit calls from raw code and generate line map
+  // Strip emit calls from raw code and generate clean JS line map
   const { displayCode: cleanJsCode, rawToDisplayLine } = useMemo(() => {
     return getCleanDisplayCode(rawCode);
   }, [rawCode]);
 
+  // Retrieve language implementation (code and line map)
+  const langImpl = useMemo(() => {
+    if (!slug) return null;
+    return MULTI_LANG_SOLUTIONS[slug]?.[selectedLanguage] ?? null;
+  }, [slug, selectedLanguage]);
+
   // Determine active displayed code based on selected language
   const displayedCode = useMemo(() => {
-    if (selectedLanguage === 'JavaScript') {
-      return cleanJsCode;
-    }
-    if (slug && MULTI_LANG_SOLUTIONS[slug]?.[selectedLanguage]) {
-      return MULTI_LANG_SOLUTIONS[slug][selectedLanguage]!;
+    if (langImpl?.code) {
+      return langImpl.code;
     }
     return cleanJsCode;
-  }, [selectedLanguage, cleanJsCode, slug]);
+  }, [langImpl, cleanJsCode]);
 
   const lines = displayedCode.trim().split('\n');
 
-  // Map instrumented engine line to clean display line (applicable for JS/TS)
+  // Compute active line for the selected language
   const mappedDisplayLine = useMemo(() => {
     if (!currentLine) return undefined;
-    if (selectedLanguage === 'JavaScript' || selectedLanguage === 'TypeScript') {
-      return rawToDisplayLine[currentLine] ?? currentLine;
+
+    // 1. Map raw instrumented line to clean JS line
+    const cleanJsLine = rawToDisplayLine[currentLine] ?? currentLine;
+
+    // 2. If JavaScript, return clean JS line
+    if (selectedLanguage === 'JavaScript') {
+      return cleanJsLine;
     }
-    return undefined;
-  }, [currentLine, rawToDisplayLine, selectedLanguage]);
+
+    // 3. For any other language (Python, Java, C++, TypeScript), use its dedicated lineMap
+    if (langImpl?.lineMap) {
+      return langImpl.lineMap[cleanJsLine] ?? cleanJsLine;
+    }
+
+    return cleanJsLine;
+  }, [currentLine, rawToDisplayLine, selectedLanguage, langImpl]);
 
   // Smoothly scroll active line into view
   useEffect(() => {
@@ -84,11 +98,6 @@ export const CodePanel: React.FC<CodePanelProps> = ({ rawCode, currentLine, slug
         </div>
 
         <div className="flex items-center gap-2">
-          {selectedLanguage !== 'JavaScript' && (
-            <span className="hidden sm:inline-block font-mono text-[10px] font-bold text-ink-muted bg-surface-muted px-2 py-0.5 rounded border border-ink/30">
-              JS Engine Active
-            </span>
-          )}
           <span className="font-mono text-xs text-ink font-bold">
             {mappedDisplayLine ? `Line ${mappedDisplayLine}` : 'Ready'}
           </span>
