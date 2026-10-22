@@ -5,10 +5,9 @@ import {
   StructureSnapshot,
   RendererConfig,
   TraceConfig,
-  TraceResult,
   ArrayStructureSnapshot,
 } from './types';
-import { createSnapshot, extractStructureSnapshot } from './snapshot';
+import { createSnapshot, extractStructureSnapshot, NodeIdRegistry } from './snapshot';
 
 export class Tracer {
   private steps: Step[] = [];
@@ -20,6 +19,7 @@ export class Tracer {
   private maxSteps: number;
   private stepCount: number = 0;
   private rendererConfig?: RendererConfig;
+  private nodeRegistry: NodeIdRegistry = new NodeIdRegistry();
 
   constructor(rendererConfig?: RendererConfig, traceConfig?: TraceConfig) {
     this.rendererConfig = rendererConfig;
@@ -45,7 +45,10 @@ export class Tracer {
   public onAssign(name: string, value: unknown): void {
     this.currentVars.set(name, value);
 
-    if (Array.isArray(value) || (value && typeof value === 'object' && '__rawTarget' in value)) {
+    if (
+      Array.isArray(value) ||
+      (value && typeof value === 'object' && ('__rawTarget' in value || 'next' in value || 'left' in value || 'right' in value))
+    ) {
       this.trackedStructures.set(name, value);
     }
   }
@@ -55,7 +58,6 @@ export class Tracer {
    */
   public note(text: string): void {
     this.pendingNote = text;
-    // Update the most recent step note if available
     if (this.steps.length > 0) {
       const lastStep = this.steps[this.steps.length - 1];
       if (lastStep) {
@@ -65,20 +67,62 @@ export class Tracer {
   }
 
   /**
-   * Wraps an array with a recording Proxy to intercept reads and writes
+   * Wraps an array with a recording Proxy to intercept reads, writes, and mutations (push, pop, shift).
+   * Also tracks non-array object structures (linked list heads, tree roots).
    */
   public wrapArray<T extends unknown[]>(arr: unknown, name: string): unknown {
+    if (arr && typeof arr === 'object') {
+      this.trackedStructures.set(name, arr);
+    }
+
     if (!Array.isArray(arr)) {
       return arr;
     }
-
-    this.trackedStructures.set(name, arr);
 
     const self = this;
     const proxy = new Proxy(arr, {
       get(target, prop, receiver) {
         if (prop === '__rawTarget') {
           return target;
+        }
+
+        // Intercept push, pop, shift for stack and queue operations
+        if (prop === 'push') {
+          return function (...items: unknown[]) {
+            for (const item of items) {
+              self.activeHighlights.push({
+                target: name,
+                role: 'swap',
+                operation: 'push',
+                color: '#FFE600',
+              });
+            }
+            return (target.push as Function).apply(target, items);
+          };
+        }
+
+        if (prop === 'pop') {
+          return function () {
+            self.activeHighlights.push({
+              target: name,
+              role: 'swap',
+              operation: 'pop',
+              color: '#FF5E7E',
+            });
+            return (target.pop as Function).apply(target);
+          };
+        }
+
+        if (prop === 'shift') {
+          return function () {
+            self.activeHighlights.push({
+              target: name,
+              role: 'swap',
+              operation: 'dequeue',
+              color: '#FF5E7E',
+            });
+            return (target.shift as Function).apply(target);
+          };
         }
 
         if (typeof prop === 'string' && /^\d+$/.test(prop)) {
@@ -103,9 +147,7 @@ export class Tracer {
           });
         }
 
-        const res = Reflect.set(target, prop, value, receiver);
-        // Self-record step on in-place mutation if inside execution
-        return res;
+        return Reflect.set(target, prop, value, receiver);
       },
     });
 
@@ -122,20 +164,19 @@ export class Tracer {
       varsSnapshot[k] = createSnapshot(v);
     }
 
-    // 2. Extract structure snapshots
+    // 2. Extract structure snapshots using persistent node registry
     const structures: StructureSnapshot[] = [];
 
-    // If renderer config is provided, follow its structure definitions
     if (this.rendererConfig?.structures) {
       for (const structDef of this.rendererConfig.structures) {
         const raw = this.trackedStructures.get(structDef.name) ?? this.currentVars.get(structDef.name);
-        const snapshot = extractStructureSnapshot(structDef.name, raw, structDef.type);
+        const snapshot = extractStructureSnapshot(structDef.name, raw, structDef.type, this.nodeRegistry);
         if (snapshot) {
           structures.push(snapshot);
         }
       }
     } else {
-      // Auto-detect arrays from tracked structures and variables
+      // Auto-detect structures
       for (const [name, val] of this.trackedStructures.entries()) {
         const raw = (val as { __rawTarget?: unknown }).__rawTarget ?? val;
         if (Array.isArray(raw)) {
@@ -160,6 +201,7 @@ export class Tracer {
         const varVal = this.currentVars.get(mapping.variable);
         const target = mapping.targetStructure ?? primaryTarget;
 
+        // If numerical index pointer (Array / Matrix)
         if (typeof varVal === 'number' && Number.isInteger(varVal)) {
           highlights.push({
             target,
@@ -168,10 +210,22 @@ export class Tracer {
             label: mapping.label ?? mapping.variable,
           });
         }
+        // If node pointer (Linked List / Tree)
+        else if (varVal && typeof varVal === 'object') {
+          const stableNodeId = this.nodeRegistry.getExistingId(varVal);
+          if (stableNodeId) {
+            highlights.push({
+              target,
+              nodeId: stableNodeId,
+              role: mapping.role,
+              label: mapping.label ?? mapping.variable,
+            });
+          }
+        }
       }
     }
 
-    // Clear transient proxy read/write highlights for the next cycle
+    // Clear transient highlights for next line
     this.activeHighlights = [];
 
     const step: Step = {

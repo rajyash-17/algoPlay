@@ -4,13 +4,57 @@ import {
   ArrayStructureSnapshot,
   MapStructureSnapshot,
   LinkedListStructureSnapshot,
+  LinkedListNodeSnapshot,
   TreeStructureSnapshot,
+  TreeNodeSnapshot,
+  StackStructureSnapshot,
+  QueueStructureSnapshot,
 } from './types';
+
+/**
+ * Registry to maintain permanent, deterministic object-to-ID mappings across time steps.
+ */
+export class NodeIdRegistry {
+  private objectToId = new WeakMap<object, string>();
+  private knownNodesByStructure = new Map<string, Set<object>>();
+  private nextId = 1;
+
+  public getId(obj: object, prefix: string = 'node'): string {
+    const raw = (obj as { __rawTarget?: object }).__rawTarget ?? obj;
+    let id = this.objectToId.get(raw);
+    if (!id) {
+      id = `${prefix}_${this.nextId++}`;
+      this.objectToId.set(raw, id);
+    }
+    return id;
+  }
+
+  public registerStructureNode(structureName: string, obj: object, prefix: string = 'node'): string {
+    const raw = (obj as { __rawTarget?: object }).__rawTarget ?? obj;
+    let set = this.knownNodesByStructure.get(structureName);
+    if (!set) {
+      set = new Set<object>();
+      this.knownNodesByStructure.set(structureName, set);
+    }
+    set.add(raw);
+    return this.getId(raw, prefix);
+  }
+
+  public getStructureNodes(structureName: string): object[] {
+    const set = this.knownNodesByStructure.get(structureName);
+    return set ? Array.from(set) : [];
+  }
+
+  public getExistingId(obj: unknown): string | undefined {
+    if (!obj || typeof obj !== 'object') return undefined;
+    const raw = (obj as { __rawTarget?: object }).__rawTarget ?? obj;
+    return this.objectToId.get(raw);
+  }
+}
 
 /**
  * Creates an immutable snapshot of any JavaScript value.
  * Primitives are copied directly; objects, arrays, Maps and Sets are deeply cloned.
- * WeakSet is used to prevent infinite loops from circular references.
  */
 export function createSnapshot(val: unknown, seen = new WeakSet<object>()): Snapshot {
   if (val === null || val === undefined) {
@@ -31,7 +75,6 @@ export function createSnapshot(val: unknown, seen = new WeakSet<object>()): Snap
   }
 
   if (typeof val === 'object') {
-    // Unbox Proxy if present
     const rawVal = (val as { __rawTarget?: unknown }).__rawTarget ?? val;
 
     if (seen.has(rawVal as object)) {
@@ -71,11 +114,13 @@ export function createSnapshot(val: unknown, seen = new WeakSet<object>()): Snap
 
 /**
  * Extracts a structured snapshot representation for data structure renderers.
+ * Uses NodeIdRegistry for stable graph node identities across time steps.
  */
 export function extractStructureSnapshot(
   name: string,
   rawVal: unknown,
-  expectedType: 'array' | 'linked-list' | 'tree' | 'grid' | 'map'
+  expectedType: 'array' | 'linked-list' | 'tree' | 'grid' | 'map' | 'stack' | 'queue',
+  registry: NodeIdRegistry = new NodeIdRegistry()
 ): StructureSnapshot | null {
   if (rawVal === undefined || rawVal === null) {
     return null;
@@ -84,13 +129,160 @@ export function extractStructureSnapshot(
   const target = (rawVal as { __rawTarget?: unknown }).__rawTarget ?? rawVal;
 
   if (expectedType === 'array' && Array.isArray(target)) {
-    const arrSnapshot: ArrayStructureSnapshot = {
+    return {
       id: name,
       name,
       type: 'array',
       values: target.map((v) => createSnapshot(v)),
     };
-    return arrSnapshot;
+  }
+
+  if (expectedType === 'stack' && Array.isArray(target)) {
+    return {
+      id: name,
+      name,
+      type: 'stack',
+      items: target.map((v) => createSnapshot(v)),
+    };
+  }
+
+  if (expectedType === 'queue' && Array.isArray(target)) {
+    return {
+      id: name,
+      name,
+      type: 'queue',
+      items: target.map((v) => createSnapshot(v)),
+    };
+  }
+
+  if (expectedType === 'linked-list') {
+    if (!target || typeof target !== 'object') return null;
+
+    // Discover newly reachable nodes starting from target
+    const visitedSet = new Set<object>();
+    let curr: unknown = target;
+    let stepCount = 0;
+    let hasCycle = false;
+    let cycleTargetId: string | null = null;
+
+    while (curr && typeof curr === 'object' && stepCount < 500) {
+      stepCount++;
+      const rawNode = (curr as { __rawTarget?: object }).__rawTarget ?? (curr as object);
+      registry.registerStructureNode(name, rawNode, 'node');
+
+      if (visitedSet.has(rawNode)) {
+        hasCycle = true;
+        cycleTargetId = registry.getId(rawNode, 'node');
+        break;
+      }
+      visitedSet.add(rawNode);
+
+      const currObj = curr as { next?: unknown };
+      curr = currObj.next;
+    }
+
+    // Now snapshot all known nodes for this structure in deterministic order
+    const allKnownNodes = registry.getStructureNodes(name);
+    if (allKnownNodes.length === 0) return null;
+
+    const nodes: LinkedListNodeSnapshot[] = [];
+    const targetRaw = (target as { __rawTarget?: object }).__rawTarget ?? (target as object);
+    const headId = registry.getId(targetRaw, 'node');
+
+    for (const rawNode of allKnownNodes) {
+      const nodeId = registry.getId(rawNode, 'node');
+      const nodeObj = rawNode as { val?: unknown; value?: unknown; next?: unknown; random?: unknown };
+      const val = nodeObj.val !== undefined ? nodeObj.val : nodeObj.value;
+
+      let nextId: string | null = null;
+      if (nodeObj.next && typeof nodeObj.next === 'object') {
+        const nextRaw = (nodeObj.next as { __rawTarget?: object }).__rawTarget ?? (nodeObj.next as object);
+        nextId = registry.registerStructureNode(name, nextRaw, 'node');
+      }
+
+      let randomId: string | null = null;
+      if (nodeObj.random && typeof nodeObj.random === 'object') {
+        const randRaw = (nodeObj.random as { __rawTarget?: object }).__rawTarget ?? (nodeObj.random as object);
+        randomId = registry.registerStructureNode(name, randRaw, 'node');
+      }
+
+      nodes.push({
+        id: nodeId,
+        val: createSnapshot(val),
+        nextId,
+        randomId,
+      });
+    }
+
+    return {
+      id: name,
+      name,
+      type: 'linked-list',
+      nodes,
+      headId,
+      hasCycle,
+      cycleTargetId,
+    };
+  }
+
+  if (expectedType === 'tree') {
+    if (!target || typeof target !== 'object') return null;
+
+    const visitedSet = new Set<object>();
+    let rootId: string | null = null;
+
+    // Traverse and register all nodes in tree
+    function discoverTree(node: unknown): void {
+      if (!node || typeof node !== 'object') return;
+      const rawNode = (node as { __rawTarget?: object }).__rawTarget ?? (node as object);
+      if (visitedSet.has(rawNode)) return;
+      visitedSet.add(rawNode);
+
+      const nodeId = registry.registerStructureNode(name, rawNode, 'tree');
+      if (!rootId) rootId = nodeId;
+
+      const treeObj = node as { left?: unknown; right?: unknown };
+      discoverTree(treeObj.left);
+      discoverTree(treeObj.right);
+    }
+
+    discoverTree(target);
+
+    const allKnownNodes = registry.getStructureNodes(name);
+    if (allKnownNodes.length === 0) return null;
+
+    const nodes: TreeNodeSnapshot[] = [];
+    for (const rawNode of allKnownNodes) {
+      const nodeId = registry.getId(rawNode, 'tree');
+      const treeObj = rawNode as { val?: unknown; left?: unknown; right?: unknown };
+
+      let leftId: string | null = null;
+      if (treeObj.left && typeof treeObj.left === 'object') {
+        const leftRaw = (treeObj.left as { __rawTarget?: object }).__rawTarget ?? (treeObj.left as object);
+        leftId = registry.registerStructureNode(name, leftRaw, 'tree');
+      }
+
+      let rightId: string | null = null;
+      if (treeObj.right && typeof treeObj.right === 'object') {
+        const rightRaw = (treeObj.right as { __rawTarget?: object }).__rawTarget ?? (treeObj.right as object);
+        rightId = registry.registerStructureNode(name, rightRaw, 'tree');
+      }
+
+      nodes.push({
+        id: nodeId,
+        val: createSnapshot(treeObj.val),
+        leftId,
+        rightId,
+      });
+    }
+
+    return {
+      id: name,
+      name,
+      type: 'tree',
+      nodes,
+      rootId,
+    };
   }
 
   if (expectedType === 'map') {
@@ -106,85 +298,11 @@ export function extractStructureSnapshot(
         }
       }
     }
-    const mapSnapshot: MapStructureSnapshot = {
+    return {
       id: name,
       name,
       type: 'map',
       entries,
-    };
-    return mapSnapshot;
-  }
-
-  if (expectedType === 'linked-list') {
-    const nodes: LinkedListStructureSnapshot['nodes'] = [];
-    let curr: unknown = target;
-    let headId: string | null = null;
-    let idx = 0;
-    const visited = new Set<unknown>();
-
-    while (curr && typeof curr === 'object' && !visited.has(curr)) {
-      visited.add(curr);
-      const currObj = curr as { val?: unknown; value?: unknown; next?: unknown };
-      const val = currObj.val !== undefined ? currObj.val : currObj.value;
-      const nodeId = `node_${idx}`;
-      if (idx === 0) headId = nodeId;
-
-      nodes.push({
-        id: nodeId,
-        val: createSnapshot(val),
-        nextId: currObj.next ? `node_${idx + 1}` : null,
-      });
-
-      curr = currObj.next;
-      idx++;
-      if (idx > 500) break;
-    }
-
-    return {
-      id: name,
-      name,
-      type: 'linked-list',
-      nodes,
-      headId,
-    };
-  }
-
-  if (expectedType === 'tree') {
-    const nodes: TreeStructureSnapshot['nodes'] = [];
-    let rootId: string | null = null;
-    let counter = 0;
-    const visited = new Set<unknown>();
-
-    function traverseTree(node: unknown): string | null {
-      if (!node || typeof node !== 'object' || visited.has(node)) {
-        return null;
-      }
-      visited.add(node);
-      const nodeId = `tree_${counter++}`;
-      if (!rootId) rootId = nodeId;
-
-      const treeObj = node as { val?: unknown; left?: unknown; right?: unknown };
-      const leftId = traverseTree(treeObj.left);
-      const rightId = traverseTree(treeObj.right);
-
-      nodes.push({
-        id: nodeId,
-        val: createSnapshot(treeObj.val),
-        leftId,
-        rightId,
-      });
-
-      return nodeId;
-    }
-
-    traverseTree(target);
-
-    return {
-      id: name,
-      name,
-      type: 'tree',
-      nodes,
-      rootId,
     };
   }
 
