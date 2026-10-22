@@ -10,7 +10,7 @@ import { RendererHost } from '@/renderers/RendererHost';
 import { CodePanel } from '@/components/player/CodePanel';
 import { CaptionBar } from '@/components/player/CaptionBar';
 import { PlayerControls } from '@/components/player/PlayerControls';
-import { ArrowLeft, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, BookOpen, Columns, Expand, Maximize2, Minimize2 } from 'lucide-react';
 import { tokens } from '@/lib/tokens';
 
 export default function ProblemPage() {
@@ -23,6 +23,7 @@ export default function ProblemPage() {
 
   const [selectedInputIndex, setSelectedInputIndex] = useState(0);
   const [isStatementOpen, setIsStatementOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'split' | 'expanded' | 'theater'>('split');
 
   const {
     traceResult,
@@ -77,7 +78,7 @@ export default function ProblemPage() {
   const activeInput = inputs[selectedInputIndex];
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col gap-5 flex-1">
+    <div className="max-w-[1560px] mx-auto w-full px-4 sm:px-6 py-6 flex flex-col gap-5 flex-1">
       {/* Top Header Card */}
       <div className="flex flex-col gap-3 bg-surface border-3 border-ink rounded-xl p-4 shadow-standard">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -109,8 +110,48 @@ export default function ProblemPage() {
             </h1>
           </div>
 
-          {/* Right Action Bar: Statement Accordion & Test Case Selector */}
+          {/* Right Action Bar: Statement, Layout Switcher & Test Case Selector */}
           <div className="flex flex-wrap items-center gap-2">
+            {/* Window Layout Switcher */}
+            <div className="flex items-center gap-1 bg-surface-muted p-1 rounded-lg border-2 border-ink shadow-xs">
+              <button
+                onClick={() => setViewMode('split')}
+                title="Standard Split View (Code 5 / Canvas 7)"
+                className={`font-mono text-xs font-bold px-2 py-1 rounded flex items-center gap-1 transition-all ${
+                  viewMode === 'split'
+                    ? 'bg-primary text-ink border border-ink shadow-xs'
+                    : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                <Columns className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Split</span>
+              </button>
+              <button
+                onClick={() => setViewMode('expanded')}
+                title="Wide Canvas View (Code 4 / Canvas 8)"
+                className={`font-mono text-xs font-bold px-2 py-1 rounded flex items-center gap-1 transition-all ${
+                  viewMode === 'expanded'
+                    ? 'bg-primary text-ink border border-ink shadow-xs'
+                    : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                <Expand className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Wide</span>
+              </button>
+              <button
+                onClick={() => setViewMode('theater')}
+                title="Theater View (Full Width Canvas)"
+                className={`font-mono text-xs font-bold px-2 py-1 rounded flex items-center gap-1 transition-all ${
+                  viewMode === 'theater'
+                    ? 'bg-primary text-ink border border-ink shadow-xs'
+                    : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Theater</span>
+              </button>
+            </div>
+
             {/* Problem Statement Dropdown Button */}
             <button
               onClick={() => setIsStatementOpen((prev) => !prev)}
@@ -126,7 +167,7 @@ export default function ProblemPage() {
             </button>
 
             {/* Input Case Selector */}
-            <div className="flex items-center gap-1 ml-2">
+            <div className="flex items-center gap-1 ml-1">
               <span className="font-mono text-xs font-bold text-ink-muted mr-1">
                 INPUT:
               </span>
@@ -171,10 +212,18 @@ export default function ProblemPage() {
         )}
       </div>
 
-      {/* Main 2-Column Problem Workspace */}
+      {/* Main Problem Workspace with Dynamic Responsive Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 min-h-[460px]">
         {/* Left Column: Synchronized Multi-Language Code Viewer */}
-        <div className="lg:col-span-5 h-[460px] lg:h-auto">
+        <div
+          className={`${
+            viewMode === 'theater'
+              ? 'hidden'
+              : viewMode === 'expanded'
+              ? 'lg:col-span-4'
+              : 'lg:col-span-5'
+          } h-[460px] lg:h-auto`}
+        >
           <CodePanel
             rawCode={solutionCode}
             currentLine={currentStep?.line}
@@ -183,7 +232,15 @@ export default function ProblemPage() {
         </div>
 
         {/* Right Column: Visual Renderer + Step Explanations */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
+        <div
+          className={`${
+            viewMode === 'theater'
+              ? 'lg:col-span-12'
+              : viewMode === 'expanded'
+              ? 'lg:col-span-8'
+              : 'lg:col-span-7'
+          } flex flex-col gap-4`}
+        >
           {/* Active Data Structure Renderer */}
           <div className="flex-1 flex flex-col">
             <RendererHost step={currentStep} config={rendererConfig} />
