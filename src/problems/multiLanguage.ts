@@ -6,6 +6,8 @@ export interface LanguageImplementation {
   lineMap: Record<number, number>;
 }
 
+import { TREE_MULTI_LANG_SOLUTIONS } from './treeMultiLanguage';
+
 export const MULTI_LANG_SOLUTIONS: Record<string, Record<SupportedLanguage, LanguageImplementation>> = {
   'two-sum': {
     JavaScript: {
@@ -2758,4 +2760,5 @@ export const MULTI_LANG_SOLUTIONS: Record<string, Record<SupportedLanguage, Lang
       lineMap: { 1: 1, 2: 2, 3: 3, 4: 4, 6: 4, 7: 2, 24: 6, 25: 7, 26: 8, 28: 10, 29: 11, 30: 11, 32: 12, 33: 13, 34: 13, 35: 14, 36: 14, 38: 15, 39: 16, 43: 17, 44: 18, 52: 19, 53: 20, 54: 21, 56: 22, 57: 23, 58: 24, 59: 25, 60: 26, 61: 27, 62: 28, 63: 29, 64: 30, 65: 31, 67: 32, 72: 36 },
     },
   },
+  ...TREE_MULTI_LANG_SOLUTIONS,
 };

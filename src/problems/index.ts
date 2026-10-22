@@ -87,6 +87,93 @@ import { meta as lruCacheMeta } from './lru-cache/meta';
 import { inputs as lruCacheInputs } from './lru-cache/inputs';
 import { rendererConfig as lruCacheRenderer } from './lru-cache/renderer';
 
+// Binary Tree General & Traversal (Batch 3)
+import { meta as maxDepthMeta } from './maximum-depth-of-binary-tree/meta';
+import { inputs as maxDepthInputs } from './maximum-depth-of-binary-tree/inputs';
+import { rendererConfig as maxDepthRenderer } from './maximum-depth-of-binary-tree/renderer';
+
+import { meta as sameTreeMeta } from './same-tree/meta';
+import { inputs as sameTreeInputs } from './same-tree/inputs';
+import { rendererConfig as sameTreeRenderer } from './same-tree/renderer';
+
+import { meta as invertTreeMeta } from './invert-binary-tree/meta';
+import { inputs as invertTreeInputs } from './invert-binary-tree/inputs';
+import { rendererConfig as invertTreeRenderer } from './invert-binary-tree/renderer';
+
+import { meta as symmetricTreeMeta } from './symmetric-tree/meta';
+import { inputs as symmetricTreeInputs } from './symmetric-tree/inputs';
+import { rendererConfig as symmetricTreeRenderer } from './symmetric-tree/renderer';
+
+import { meta as buildTreePreInMeta } from './construct-binary-tree-from-preorder-and-inorder-traversal/meta';
+import { inputs as buildTreePreInInputs } from './construct-binary-tree-from-preorder-and-inorder-traversal/inputs';
+import { rendererConfig as buildTreePreInRenderer } from './construct-binary-tree-from-preorder-and-inorder-traversal/renderer';
+
+import { meta as buildTreeInPostMeta } from './construct-binary-tree-from-inorder-and-postorder-traversal/meta';
+import { inputs as buildTreeInPostInputs } from './construct-binary-tree-from-inorder-and-postorder-traversal/inputs';
+import { rendererConfig as buildTreeInPostRenderer } from './construct-binary-tree-from-inorder-and-postorder-traversal/renderer';
+
+import { meta as connectNextMeta } from './populating-next-right-pointers-in-each-node-ii/meta';
+import { inputs as connectNextInputs } from './populating-next-right-pointers-in-each-node-ii/inputs';
+import { rendererConfig as connectNextRenderer } from './populating-next-right-pointers-in-each-node-ii/renderer';
+
+import { meta as flattenTreeMeta } from './flatten-binary-tree-to-linked-list/meta';
+import { inputs as flattenTreeInputs } from './flatten-binary-tree-to-linked-list/inputs';
+import { rendererConfig as flattenTreeRenderer } from './flatten-binary-tree-to-linked-list/renderer';
+
+import { meta as hasPathSumMeta } from './path-sum/meta';
+import { inputs as hasPathSumInputs } from './path-sum/inputs';
+import { rendererConfig as hasPathSumRenderer } from './path-sum/renderer';
+
+import { meta as sumNumbersMeta } from './sum-root-to-leaf-numbers/meta';
+import { inputs as sumNumbersInputs } from './sum-root-to-leaf-numbers/inputs';
+import { rendererConfig as sumNumbersRenderer } from './sum-root-to-leaf-numbers/renderer';
+
+import { meta as maxPathSumMeta } from './binary-tree-maximum-path-sum/meta';
+import { inputs as maxPathSumInputs } from './binary-tree-maximum-path-sum/inputs';
+import { rendererConfig as maxPathSumRenderer } from './binary-tree-maximum-path-sum/renderer';
+
+import { meta as bstIteratorMeta } from './binary-search-tree-iterator/meta';
+import { inputs as bstIteratorInputs } from './binary-search-tree-iterator/inputs';
+import { rendererConfig as bstIteratorRenderer } from './binary-search-tree-iterator/renderer';
+
+import { meta as countNodesMeta } from './count-complete-tree-nodes/meta';
+import { inputs as countNodesInputs } from './count-complete-tree-nodes/inputs';
+import { rendererConfig as countNodesRenderer } from './count-complete-tree-nodes/renderer';
+
+import { meta as lowestCommonAncestorMeta } from './lowest-common-ancestor-of-a-binary-tree/meta';
+import { inputs as lowestCommonAncestorInputs } from './lowest-common-ancestor-of-a-binary-tree/inputs';
+import { rendererConfig as lowestCommonAncestorRenderer } from './lowest-common-ancestor-of-a-binary-tree/renderer';
+
+// Binary Tree BFS
+import { meta as rightSideViewMeta } from './binary-tree-right-side-view/meta';
+import { inputs as rightSideViewInputs } from './binary-tree-right-side-view/inputs';
+import { rendererConfig as rightSideViewRenderer } from './binary-tree-right-side-view/renderer';
+
+import { meta as averageOfLevelsMeta } from './average-of-levels-in-binary-tree/meta';
+import { inputs as averageOfLevelsInputs } from './average-of-levels-in-binary-tree/inputs';
+import { rendererConfig as averageOfLevelsRenderer } from './average-of-levels-in-binary-tree/renderer';
+
+import { meta as levelOrderMeta } from './binary-tree-level-order-traversal/meta';
+import { inputs as levelOrderInputs } from './binary-tree-level-order-traversal/inputs';
+import { rendererConfig as levelOrderRenderer } from './binary-tree-level-order-traversal/renderer';
+
+import { meta as zigzagLevelOrderMeta } from './binary-tree-zigzag-level-order-traversal/meta';
+import { inputs as zigzagLevelOrderInputs } from './binary-tree-zigzag-level-order-traversal/inputs';
+import { rendererConfig as zigzagLevelOrderRenderer } from './binary-tree-zigzag-level-order-traversal/renderer';
+
+// Binary Search Tree
+import { meta as minDiffBstMeta } from './minimum-absolute-difference-in-bst/meta';
+import { inputs as minDiffBstInputs } from './minimum-absolute-difference-in-bst/inputs';
+import { rendererConfig as minDiffBstRenderer } from './minimum-absolute-difference-in-bst/renderer';
+
+import { meta as kthSmallestBstMeta } from './kth-smallest-element-in-a-bst/meta';
+import { inputs as kthSmallestBstInputs } from './kth-smallest-element-in-a-bst/inputs';
+import { rendererConfig as kthSmallestBstRenderer } from './kth-smallest-element-in-a-bst/renderer';
+
+import { meta as isValidBstMeta } from './validate-binary-search-tree/meta';
+import { inputs as isValidBstInputs } from './validate-binary-search-tree/inputs';
+import { rendererConfig as isValidBstRenderer } from './validate-binary-search-tree/renderer';
+
 export interface ProblemDefinition {
   meta: ProblemMeta;
   solutionCode: string;
@@ -698,6 +785,491 @@ const lruCacheCode = `function simulateLRUCache(capacity, operations, argsList) 
   return result;
 }`;
 
+// Binary Tree General & Traversal Solutions (Batch 3)
+const maxDepthCode = `function maxDepth(root) {
+  if (root === null) return 0;
+
+  const leftDepth = maxDepth(root.left);
+  const rightDepth = maxDepth(root.right);
+  const depth = 1 + Math.max(leftDepth, rightDepth);
+
+  note("At node " + root.val + ": left depth = " + leftDepth + ", right depth = " + rightDepth + ", max depth = " + depth);
+  return depth;
+}`;
+
+const sameTreeCode = `function isSameTree(p, q) {
+  if (p === null && q === null) return true;
+  if (p === null || q === null) {
+    note("Structure mismatch: one node is null and the other is not");
+    return false;
+  }
+
+  if (p.val !== q.val) {
+    note("Value mismatch: p.val (" + p.val + ") !== q.val (" + q.val + ")");
+    return false;
+  }
+
+  note("Values match at (" + p.val + "); checking subtrees");
+  return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+}`;
+
+const invertTreeCode = `function invertTree(root) {
+  if (root === null) return null;
+
+  note("At node " + root.val + ": swapping left and right subtrees");
+  const temp = root.left;
+  root.left = root.right;
+  root.right = temp;
+
+  invertTree(root.left);
+  invertTree(root.right);
+
+  return root;
+}`;
+
+const symmetricTreeCode = `function isSymmetric(root) {
+  if (root === null) return true;
+
+  function isMirror(t1, t2) {
+    if (t1 === null && t2 === null) return true;
+    if (t1 === null || t2 === null) {
+      note("One subtree is null while other is not; not symmetric");
+      return false;
+    }
+    if (t1.val !== t2.val) {
+      note("Value mismatch: t1.val (" + t1.val + ") !== t2.val (" + t2.val + ")");
+      return false;
+    }
+
+    note("Values match (" + t1.val + "); checking outer pair and inner pair");
+    return isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left);
+  }
+
+  note("Checking if left and right subtrees of root are mirrors");
+  return isMirror(root.left, root.right);
+}`;
+
+const buildTreePreInCode = `function buildTree(preorder, inorder) {
+  const inorderIndexMap = new Map();
+  for (let i = 0; i < inorder.length; i++) {
+    inorderIndexMap.set(inorder[i], i);
+  }
+
+  let preIdx = 0;
+
+  function helper(left, right) {
+    if (left > right) return null;
+
+    const rootVal = preorder[preIdx];
+    preIdx++;
+    const root = { val: rootVal, left: null, right: null };
+    const mid = inorderIndexMap.get(rootVal);
+
+    note("Creating node " + rootVal + " with inorder range [" + left + ", " + right + "]");
+    root.left = helper(left, mid - 1);
+    root.right = helper(mid + 1, right);
+
+    return root;
+  }
+
+  return helper(0, inorder.length - 1);
+}`;
+
+const buildTreeInPostCode = `function buildTree(inorder, postorder) {
+  const inorderIndexMap = new Map();
+  for (let i = 0; i < inorder.length; i++) {
+    inorderIndexMap.set(inorder[i], i);
+  }
+
+  let postIdx = postorder.length - 1;
+
+  function helper(left, right) {
+    if (left > right) return null;
+
+    const rootVal = postorder[postIdx];
+    postIdx--;
+    const root = { val: rootVal, left: null, right: null };
+    const mid = inorderIndexMap.get(rootVal);
+
+    note("Creating node " + rootVal + " from postorder; right subtree recurses first");
+    root.right = helper(mid + 1, right);
+    root.left = helper(left, mid - 1);
+
+    return root;
+  }
+
+  return helper(0, inorder.length - 1);
+}`;
+
+const connectNextCode = `function connect(root) {
+  if (root === null) return null;
+
+  let head = root;
+
+  while (head !== null) {
+    const dummyHead = { val: 0, next: null };
+    let tail = dummyHead;
+    let curr = head;
+
+    while (curr !== null) {
+      if (curr.left !== null) {
+        tail.next = curr.left;
+        tail = tail.next;
+        note("Connect next right pointer to left child " + curr.left.val);
+      }
+      if (curr.right !== null) {
+        tail.next = curr.right;
+        tail = tail.next;
+        note("Connect next right pointer to right child " + curr.right.val);
+      }
+      curr = curr.next || null;
+    }
+
+    head = dummyHead.next;
+  }
+
+  return root;
+}`;
+
+const flattenTreeCode = `function flatten(root) {
+  let curr = root;
+
+  while (curr !== null) {
+    if (curr.left !== null) {
+      let runner = curr.left;
+      while (runner.right !== null) {
+        runner = runner.right;
+      }
+
+      note("Connect right subtree of " + curr.val + " to rightmost node " + runner.val + " of left subtree");
+      runner.right = curr.right;
+      curr.right = curr.left;
+      curr.left = null;
+    }
+
+    curr = curr.right;
+  }
+
+  return root;
+}`;
+
+const hasPathSumCode = `function hasPathSum(root, targetSum) {
+  if (root === null) return false;
+
+  const remaining = targetSum - root.val;
+  note("At node " + root.val + ": remaining sum needed = " + remaining);
+
+  if (root.left === null && root.right === null) {
+    const isMatch = remaining === 0;
+    note("Leaf reached. Sum matches: " + isMatch);
+    return isMatch;
+  }
+
+  return hasPathSum(root.left, remaining) || hasPathSum(root.right, remaining);
+}`;
+
+const sumNumbersCode = `function sumNumbers(root) {
+  function dfs(node, currentSum) {
+    if (node === null) return 0;
+
+    currentSum = currentSum * 10 + node.val;
+    note("At node " + node.val + ": accumulated path number = " + currentSum);
+
+    if (node.left === null && node.right === null) {
+      note("Reached leaf node " + node.val + ", contributing " + currentSum + " to total sum");
+      return currentSum;
+    }
+
+    return dfs(node.left, currentSum) + dfs(node.right, currentSum);
+  }
+
+  return dfs(root, 0);
+}`;
+
+const maxPathSumCode = `function maxPathSum(root) {
+  let maxSum = -Infinity;
+
+  function maxGain(node) {
+    if (node === null) return 0;
+
+    const leftGain = Math.max(maxGain(node.left), 0);
+    const rightGain = Math.max(maxGain(node.right), 0);
+    const currentPrice = node.val + leftGain + rightGain;
+
+    if (currentPrice > maxSum) {
+      maxSum = currentPrice;
+      note("New maximum path sum found: " + maxSum + " through node " + node.val);
+    } else {
+      note("At node " + node.val + ": local path sum = " + currentPrice + ", best overall = " + maxSum);
+    }
+
+    return node.val + Math.max(leftGain, rightGain);
+  }
+
+  maxGain(root);
+  return maxSum;
+}`;
+
+const bstIteratorCode = `function bstIterator(root) {
+  const stack = [];
+  const result = [];
+
+  let curr = root;
+  while (curr !== null) {
+    stack.push(curr);
+    note("Pushing left ancestor node " + curr.val + " to iterator stack");
+    curr = curr.left;
+  }
+
+  while (stack.length > 0) {
+    const node = stack.pop();
+    result.push(node.val);
+    note("Iterator next(): yields " + node.val);
+
+    let nextNode = node.right;
+    while (nextNode !== null) {
+      stack.push(nextNode);
+      note("Pushing node " + nextNode.val + " from right branch to stack");
+      nextNode = nextNode.left;
+    }
+  }
+
+  return result;
+}`;
+
+const countNodesCode = `function countNodes(root) {
+  if (root === null) return 0;
+
+  let leftHeight = 0;
+  let currLeft = root;
+  while (currLeft !== null) {
+    leftHeight++;
+    currLeft = currLeft.left;
+  }
+
+  let rightHeight = 0;
+  let currRight = root;
+  while (currRight !== null) {
+    rightHeight++;
+    currRight = currRight.right;
+  }
+
+  if (leftHeight === rightHeight) {
+    const fullCount = (1 << leftHeight) - 1;
+    note("Subtree at " + root.val + " is full (height " + leftHeight + "). Nodes = " + fullCount);
+    return fullCount;
+  }
+
+  note("Subtree at " + root.val + " is not full; counting 1 + left + right");
+  return 1 + countNodes(root.left) + countNodes(root.right);
+}`;
+
+const lowestCommonAncestorCode = `function lowestCommonAncestor(root, pVal, qVal) {
+  function findLCA(node) {
+    if (node === null) return null;
+    if (node.val === pVal || node.val === qVal) {
+      note("Matched search target node (" + node.val + ")");
+      return node;
+    }
+
+    const left = findLCA(node.left);
+    const right = findLCA(node.right);
+
+    if (left !== null && right !== null) {
+      note("Node " + node.val + " is the LCA because targets are split across left and right branches");
+      return node;
+    }
+
+    return left !== null ? left : right;
+  }
+
+  const result = findLCA(root);
+  return result !== null ? result.val : null;
+}`;
+
+const rightSideViewCode = `function rightSideView(root) {
+  if (root === null) return [];
+
+  const queue = [root];
+  const result = [];
+
+  while (queue.length > 0) {
+    const levelSize = queue.length;
+
+    for (let i = 0; i < levelSize; i++) {
+      const node = queue.shift();
+
+      if (i === levelSize - 1) {
+        result.push(node.val);
+        note("Rightmost node of current level is " + node.val + "; added to result");
+      }
+
+      if (node.left !== null) queue.push(node.left);
+      if (node.right !== null) queue.push(node.right);
+    }
+  }
+
+  return result;
+}`;
+
+const averageOfLevelsCode = `function averageOfLevels(root) {
+  if (root === null) return [];
+
+  const queue = [root];
+  const averages = [];
+
+  while (queue.length > 0) {
+    const levelSize = queue.length;
+    let levelSum = 0;
+
+    for (let i = 0; i < levelSize; i++) {
+      const node = queue.shift();
+      levelSum += node.val;
+
+      if (node.left !== null) queue.push(node.left);
+      if (node.right !== null) queue.push(node.right);
+    }
+
+    const avg = levelSum / levelSize;
+    averages.push(avg);
+    note("Level completed: sum = " + levelSum + ", size = " + levelSize + ", average = " + avg);
+  }
+
+  return averages;
+}`;
+
+const levelOrderCode = `function levelOrder(root) {
+  if (root === null) return [];
+
+  const queue = [root];
+  const result = [];
+
+  while (queue.length > 0) {
+    const levelSize = queue.length;
+    const currentLevel = [];
+
+    for (let i = 0; i < levelSize; i++) {
+      const node = queue.shift();
+      currentLevel.push(node.val);
+
+      if (node.left !== null) queue.push(node.left);
+      if (node.right !== null) queue.push(node.right);
+    }
+
+    result.push(currentLevel);
+    note("Completed level with values: [" + currentLevel.join(", ") + "]");
+  }
+
+  return result;
+}`;
+
+const zigzagLevelOrderCode = `function zigzagLevelOrder(root) {
+  if (root === null) return [];
+
+  const queue = [root];
+  const result = [];
+  let leftToRight = true;
+
+  while (queue.length > 0) {
+    const levelSize = queue.length;
+    const currentLevel = [];
+
+    for (let i = 0; i < levelSize; i++) {
+      const node = queue.shift();
+
+      if (leftToRight) {
+        currentLevel.push(node.val);
+      } else {
+        currentLevel.unshift(node.val);
+      }
+
+      if (node.left !== null) queue.push(node.left);
+      if (node.right !== null) queue.push(node.right);
+    }
+
+    result.push(currentLevel);
+    note("Completed level with direction " + (leftToRight ? "L-to-R" : "R-to-L") + ": [" + currentLevel.join(", ") + "]");
+    leftToRight = !leftToRight;
+  }
+
+  return result;
+}`;
+
+const minDiffBstCode = `function getMinimumDifference(root) {
+  let minDiff = Infinity;
+  let prevVal = null;
+
+  function inorder(node) {
+    if (node === null) return;
+
+    inorder(node.left);
+
+    if (prevVal !== null) {
+      const diff = node.val - prevVal;
+      if (diff < minDiff) {
+        minDiff = diff;
+        note("New minimum difference: " + minDiff + " (between " + prevVal + " and " + node.val + ")");
+      } else {
+        note("Difference: " + diff + " (between " + prevVal + " and " + node.val + ")");
+      }
+    } else {
+      note("First inorder node: " + node.val);
+    }
+    prevVal = node.val;
+
+    inorder(node.right);
+  }
+
+  inorder(root);
+  return minDiff;
+}`;
+
+const kthSmallestBstCode = `function kthSmallest(root, k) {
+  let count = 0;
+  let result = null;
+
+  function inorder(node) {
+    if (node === null || result !== null) return;
+
+    inorder(node.left);
+
+    if (result === null) {
+      count++;
+      note("Visited node " + node.val + " (rank #" + count + ")");
+      if (count === k) {
+        result = node.val;
+        note("Found " + k + "-th smallest element: " + result);
+        return;
+      }
+    }
+
+    inorder(node.right);
+  }
+
+  inorder(root);
+  return result;
+}`;
+
+const isValidBstCode = `function isValidBST(root) {
+  function validate(node, min, max) {
+    if (node === null) return true;
+
+    if (min !== null && node.val <= min) {
+      note("Violation: node " + node.val + " <= minimum allowed " + min);
+      return false;
+    }
+    if (max !== null && node.val >= max) {
+      note("Violation: node " + node.val + " >= maximum allowed " + max);
+      return false;
+    }
+
+    note("Node " + node.val + " is valid within (" + min + ", " + max + ")");
+    return validate(node.left, min, node.val) && validate(node.right, node.val, max);
+  }
+
+  return validate(root, null, null);
+}`;
+
 export const PROBLEMS: ProblemDefinition[] = [
   // Array Category
   {
@@ -829,6 +1401,138 @@ export const PROBLEMS: ProblemDefinition[] = [
     solutionCode: lruCacheCode,
     inputs: lruCacheInputs,
     rendererConfig: lruCacheRenderer,
+  },
+
+  // Binary Tree General Category (Batch 3)
+  {
+    meta: maxDepthMeta,
+    solutionCode: maxDepthCode,
+    inputs: maxDepthInputs,
+    rendererConfig: maxDepthRenderer,
+  },
+  {
+    meta: sameTreeMeta,
+    solutionCode: sameTreeCode,
+    inputs: sameTreeInputs,
+    rendererConfig: sameTreeRenderer,
+  },
+  {
+    meta: invertTreeMeta,
+    solutionCode: invertTreeCode,
+    inputs: invertTreeInputs,
+    rendererConfig: invertTreeRenderer,
+  },
+  {
+    meta: symmetricTreeMeta,
+    solutionCode: symmetricTreeCode,
+    inputs: symmetricTreeInputs,
+    rendererConfig: symmetricTreeRenderer,
+  },
+  {
+    meta: buildTreePreInMeta,
+    solutionCode: buildTreePreInCode,
+    inputs: buildTreePreInInputs,
+    rendererConfig: buildTreePreInRenderer,
+  },
+  {
+    meta: buildTreeInPostMeta,
+    solutionCode: buildTreeInPostCode,
+    inputs: buildTreeInPostInputs,
+    rendererConfig: buildTreeInPostRenderer,
+  },
+  {
+    meta: connectNextMeta,
+    solutionCode: connectNextCode,
+    inputs: connectNextInputs,
+    rendererConfig: connectNextRenderer,
+  },
+  {
+    meta: flattenTreeMeta,
+    solutionCode: flattenTreeCode,
+    inputs: flattenTreeInputs,
+    rendererConfig: flattenTreeRenderer,
+  },
+  {
+    meta: hasPathSumMeta,
+    solutionCode: hasPathSumCode,
+    inputs: hasPathSumInputs,
+    rendererConfig: hasPathSumRenderer,
+  },
+  {
+    meta: sumNumbersMeta,
+    solutionCode: sumNumbersCode,
+    inputs: sumNumbersInputs,
+    rendererConfig: sumNumbersRenderer,
+  },
+  {
+    meta: maxPathSumMeta,
+    solutionCode: maxPathSumCode,
+    inputs: maxPathSumInputs,
+    rendererConfig: maxPathSumRenderer,
+  },
+  {
+    meta: bstIteratorMeta,
+    solutionCode: bstIteratorCode,
+    inputs: bstIteratorInputs,
+    rendererConfig: bstIteratorRenderer,
+  },
+  {
+    meta: countNodesMeta,
+    solutionCode: countNodesCode,
+    inputs: countNodesInputs,
+    rendererConfig: countNodesRenderer,
+  },
+  {
+    meta: lowestCommonAncestorMeta,
+    solutionCode: lowestCommonAncestorCode,
+    inputs: lowestCommonAncestorInputs,
+    rendererConfig: lowestCommonAncestorRenderer,
+  },
+
+  // Binary Tree BFS Category
+  {
+    meta: rightSideViewMeta,
+    solutionCode: rightSideViewCode,
+    inputs: rightSideViewInputs,
+    rendererConfig: rightSideViewRenderer,
+  },
+  {
+    meta: averageOfLevelsMeta,
+    solutionCode: averageOfLevelsCode,
+    inputs: averageOfLevelsInputs,
+    rendererConfig: averageOfLevelsRenderer,
+  },
+  {
+    meta: levelOrderMeta,
+    solutionCode: levelOrderCode,
+    inputs: levelOrderInputs,
+    rendererConfig: levelOrderRenderer,
+  },
+  {
+    meta: zigzagLevelOrderMeta,
+    solutionCode: zigzagLevelOrderCode,
+    inputs: zigzagLevelOrderInputs,
+    rendererConfig: zigzagLevelOrderRenderer,
+  },
+
+  // Binary Search Tree Category
+  {
+    meta: minDiffBstMeta,
+    solutionCode: minDiffBstCode,
+    inputs: minDiffBstInputs,
+    rendererConfig: minDiffBstRenderer,
+  },
+  {
+    meta: kthSmallestBstMeta,
+    solutionCode: kthSmallestBstCode,
+    inputs: kthSmallestBstInputs,
+    rendererConfig: kthSmallestBstRenderer,
+  },
+  {
+    meta: isValidBstMeta,
+    solutionCode: isValidBstCode,
+    inputs: isValidBstInputs,
+    rendererConfig: isValidBstRenderer,
   },
 ];
 
