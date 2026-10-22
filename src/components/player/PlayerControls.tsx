@@ -2,9 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { usePlayerStore } from '@/lib/playerStore';
-import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, Minus, Plus } from 'lucide-react';
 
-const SPEED_OPTIONS = [0.5, 1, 2, 4];
+const PRESET_SPEEDS = [0.25, 0.5, 0.75, 1, 1.5, 2, 4];
 
 export const PlayerControls: React.FC = () => {
   const {
@@ -25,11 +25,12 @@ export const PlayerControls: React.FC = () => {
   const totalSteps = steps.length;
   const hasSteps = totalSteps > 0;
 
-  // Playback timer loop
+  // Playback timer loop: lower speed = slower interval, higher speed = faster interval
   useEffect(() => {
     if (!isPlaying || !hasSteps) return;
 
-    const intervalMs = Math.max(80, Math.round(700 / speed));
+    // Base interval at 1x is 800ms
+    const intervalMs = Math.max(50, Math.round(800 / speed));
     const timer = setInterval(() => {
       const state = usePlayerStore.getState();
       if (state.currentStepIndex >= state.steps.length - 1) {
@@ -45,9 +46,8 @@ export const PlayerControls: React.FC = () => {
   // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input or textarea
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
         return;
       }
 
@@ -69,6 +69,16 @@ export const PlayerControls: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlay, stepForward, stepBackward, restart]);
+
+  const decreaseSpeed = () => {
+    const nextSpeed = Math.max(0.1, Math.round((speed - 0.25) * 100) / 100);
+    setSpeed(nextSpeed);
+  };
+
+  const increaseSpeed = () => {
+    const nextSpeed = Math.min(5, Math.round((speed + 0.25) * 100) / 100);
+    setSpeed(nextSpeed);
+  };
 
   return (
     <div className="w-full bg-surface border-3 border-ink rounded-lg shadow-standard p-4 flex flex-col gap-3">
@@ -146,25 +156,42 @@ export const PlayerControls: React.FC = () => {
           </button>
         </div>
 
-        {/* Speed multiplier selector */}
-        <div className="flex items-center gap-1 bg-surface-muted p-1 border-2 border-ink rounded shadow-sm">
-          <span className="font-mono text-xs font-bold text-ink-muted px-2">SPEED:</span>
-          {SPEED_OPTIONS.map((rate) => {
-            const isActive = speed === rate;
-            return (
-              <button
-                key={rate}
-                onClick={() => setSpeed(rate)}
-                className={`px-2 py-0.5 font-mono text-xs font-bold rounded border ${
-                  isActive
-                    ? 'bg-secondary text-ink border-ink shadow-sm'
-                    : 'bg-transparent text-ink border-transparent hover:bg-surface'
-                }`}
-              >
-                {rate}x
-              </button>
-            );
-          })}
+        {/* Speed Controls: Slower (0.25x) to Faster (4x) with fine adjustments */}
+        <div className="flex items-center gap-1.5 bg-surface-muted p-1 border-2 border-ink rounded shadow-sm">
+          <button
+            onClick={decreaseSpeed}
+            title="Decrease speed"
+            className="p-1 border border-ink bg-surface hover:bg-canvas rounded font-bold"
+          >
+            <Minus className="w-3 h-3 text-ink" />
+          </button>
+
+          <div className="flex items-center gap-1 overflow-x-auto max-w-[260px] sm:max-w-none">
+            {PRESET_SPEEDS.map((rate) => {
+              const isActive = speed === rate;
+              return (
+                <button
+                  key={rate}
+                  onClick={() => setSpeed(rate)}
+                  className={`px-1.5 py-0.5 font-mono text-xs font-bold rounded border ${
+                    isActive
+                      ? 'bg-secondary text-ink border-ink shadow-sm'
+                      : 'bg-transparent text-ink border-transparent hover:bg-surface'
+                  }`}
+                >
+                  {rate}x
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={increaseSpeed}
+            title="Increase speed"
+            className="p-1 border border-ink bg-surface hover:bg-canvas rounded font-bold"
+          >
+            <Plus className="w-3 h-3 text-ink" />
+          </button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { executeTrace, ExecuteTraceOptions } from './run';
+import { executeTrace, ExecuteTraceOptions } from './executor';
 
 // Web Worker message listener
 self.onmessage = (event: MessageEvent<ExecuteTraceOptions>) => {

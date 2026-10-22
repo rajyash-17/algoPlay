@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useParams, notFound } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { getProblemBySlug, ProblemDefinition } from '@/problems';
 import { usePlayerStore } from '@/lib/playerStore';
 import { runTrace } from '@/engine/run';
@@ -10,7 +10,7 @@ import { ArrayRenderer } from '@/renderers/ArrayRenderer';
 import { CodePanel } from '@/components/player/CodePanel';
 import { CaptionBar } from '@/components/player/CaptionBar';
 import { PlayerControls } from '@/components/player/PlayerControls';
-import { ArrowLeft, PlayCircle, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { tokens } from '@/lib/tokens';
 
 export default function ProblemPage() {
@@ -22,6 +22,7 @@ export default function ProblemPage() {
   }, [slug]);
 
   const [selectedInputIndex, setSelectedInputIndex] = useState(0);
+  const [isStatementOpen, setIsStatementOpen] = useState(false);
 
   const {
     traceResult,
@@ -77,65 +78,108 @@ export default function ProblemPage() {
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 py-6 flex flex-col gap-5 flex-1">
-      {/* Top Bar: Problem Details & Input Selector */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-surface border-3 border-ink rounded-xl p-4 shadow-standard">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="p-1 hover:bg-surface-muted border border-ink rounded font-mono text-xs font-bold flex items-center gap-1 text-ink"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Problems
-            </Link>
-            <span className="font-mono text-xs font-bold text-ink-muted">
-              #{meta.number}
-            </span>
-            <span
-              style={{ backgroundColor: diffStyle.bg, color: diffStyle.text }}
-              className="font-mono text-xs font-black px-2 py-0.5 rounded border border-ink shadow-sm"
-            >
-              {meta.difficulty}
-            </span>
-            <span className="font-mono text-xs font-bold bg-surface-muted text-ink px-2 py-0.5 rounded border border-ink/40">
-              {meta.pattern}
-            </span>
+      {/* Top Header Card */}
+      <div className="flex flex-col gap-3 bg-surface border-3 border-ink rounded-xl p-4 shadow-standard">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                className="p-1 hover:bg-surface-muted border border-ink rounded font-mono text-xs font-bold flex items-center gap-1 text-ink"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Problems
+              </Link>
+              <span className="font-mono text-xs font-bold text-ink-muted">
+                #{meta.number}
+              </span>
+              <span
+                style={{ backgroundColor: diffStyle.bg, color: diffStyle.text }}
+                className="font-mono text-xs font-black px-2 py-0.5 rounded border border-ink shadow-sm"
+              >
+                {meta.difficulty}
+              </span>
+              <span className="font-mono text-xs font-bold bg-surface-muted text-ink px-2 py-0.5 rounded border border-ink/40">
+                {meta.pattern}
+              </span>
+            </div>
+
+            <h1 className="text-xl sm:text-2xl font-mono font-black text-ink">
+              {meta.title}
+            </h1>
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-mono font-black text-ink">
-            {meta.title}
-          </h1>
+          {/* Right Action Bar: Statement Accordion & Test Case Selector */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Problem Statement Dropdown Button */}
+            <button
+              onClick={() => setIsStatementOpen((prev) => !prev)}
+              className="flex items-center gap-1.5 bg-canvas hover:bg-surface-muted px-3 py-1.5 border-2 border-ink rounded font-mono text-xs font-bold shadow-sm transition-all"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-ink" />
+              <span>Problem Statement</span>
+              {isStatementOpen ? (
+                <ChevronUp className="w-4 h-4 text-ink" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-ink" />
+              )}
+            </button>
+
+            {/* Input Case Selector */}
+            <div className="flex items-center gap-1 ml-2">
+              <span className="font-mono text-xs font-bold text-ink-muted mr-1">
+                INPUT:
+              </span>
+              {inputs.map((inp, idx) => {
+                const isSelected = selectedInputIndex === idx;
+                return (
+                  <button
+                    key={inp.name}
+                    onClick={() => setSelectedInputIndex(idx)}
+                    className={`font-mono text-xs font-bold px-2.5 py-1 rounded border-2 border-ink transition-all ${
+                      isSelected
+                        ? 'bg-primary text-ink shadow-sm'
+                        : 'bg-surface text-ink hover:bg-surface-muted'
+                    }`}
+                  >
+                    Case {idx + 1}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
-        {/* Input Selector Tabs */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-xs font-bold text-ink-muted mr-1">
-            INPUT CASE:
-          </span>
-          {inputs.map((inp, idx) => {
-            const isSelected = selectedInputIndex === idx;
-            return (
-              <button
-                key={inp.name}
-                onClick={() => setSelectedInputIndex(idx)}
-                className={`font-mono text-xs font-bold px-3 py-1.5 rounded border-2 border-ink transition-all ${
-                  isSelected
-                    ? 'bg-primary text-ink shadow-sm translate-x-[1px] translate-y-[1px]'
-                    : 'bg-surface text-ink hover:bg-surface-muted'
-                }`}
-              >
-                Case {idx + 1}
-              </button>
-            );
-          })}
-        </div>
+        {/* Collapsible Problem Statement Panel */}
+        {isStatementOpen && (
+          <div className="pt-3 border-t-2 border-surface-muted flex flex-col gap-2 bg-canvas p-3 rounded-lg border-2 border-ink shadow-inner">
+            <h2 className="font-mono text-xs font-black text-ink uppercase tracking-wider">
+              Problem Description
+            </h2>
+            <p className="font-mono text-xs sm:text-sm text-ink leading-relaxed font-medium">
+              {meta.description ?? 'Given the input data, find the solution step-by-step.'}
+            </p>
+            {activeInput && (
+              <div className="mt-1 pt-2 border-t border-ink/20 flex flex-wrap items-center gap-3 font-mono text-xs">
+                <span className="text-ink-muted font-bold">Active Input:</span>
+                <code className="bg-surface px-2 py-0.5 border border-ink rounded font-semibold text-ink">
+                  {activeInput.name}
+                </code>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Main 2-Column Problem Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 min-h-[460px]">
-        {/* Left Column: Synchronized Code Viewer */}
+        {/* Left Column: Synchronized Multi-Language Code Viewer */}
         <div className="lg:col-span-5 h-[460px] lg:h-auto">
-          <CodePanel code={solutionCode} currentLine={currentStep?.line} />
+          <CodePanel
+            rawCode={solutionCode}
+            currentLine={currentStep?.line}
+            slug={slug}
+          />
         </div>
 
         {/* Right Column: Visual Renderer + Step Explanations */}
