@@ -1,5 +1,6 @@
 import {
   Step,
+  Snapshot,
   Highlight,
   StructureSnapshot,
   RendererConfig,
@@ -116,7 +117,7 @@ export class Tracer {
    */
   public recordStep(): void {
     // 1. Immutable snapshot of local variables
-    const varsSnapshot: Record<string, unknown> = {};
+    const varsSnapshot: Record<string, Snapshot> = {};
     for (const [k, v] of this.currentVars.entries()) {
       varsSnapshot[k] = createSnapshot(v);
     }
