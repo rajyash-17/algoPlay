@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatSnapshotValue, formatReturnValue, isTreeNode, isListNode } from '@/lib/formatValue';
+import { formatSnapshotValue, formatReturnValue, isTreeNode, isListNode, isGraphNode } from '@/lib/formatValue';
 
 describe('Snapshot Value Formatter', () => {
   it('formats primitives correctly', () => {
@@ -8,6 +8,17 @@ describe('Snapshot Value Formatter', () => {
     expect(formatSnapshotValue(true)).toBe('true');
     expect(formatSnapshotValue(null)).toBe('null');
     expect(formatSnapshotValue(undefined)).toBe('undefined');
+  });
+
+  it('truncates long strings cleanly', () => {
+    const longStr = 'a very long sentence that exceeds limits';
+    expect(formatSnapshotValue(longStr)).toBe('"a very long sentence t..."');
+  });
+
+  it('formats functions cleanly as ƒ()', () => {
+    expect(formatSnapshotValue(() => {})).toBe('ƒ()');
+    expect(formatSnapshotValue('function dfs(node) { return 0; }')).toBe('ƒ()');
+    expect(formatSnapshotValue('(a, b) => a + b')).toBe('ƒ()');
   });
 
   it('formats tree nodes compactly as Node(val) instead of recursive JSON', () => {
@@ -31,9 +42,25 @@ describe('Snapshot Value Formatter', () => {
     expect(formatSnapshotValue(listNode)).toBe('Node(10)');
   });
 
+  it('formats graph nodes compactly as Node(val)', () => {
+    const graphNode = {
+      val: 1,
+      neighbors: [],
+    };
+
+    expect(isGraphNode(graphNode)).toBe(true);
+    expect(formatSnapshotValue(graphNode)).toBe('Node(1)');
+  });
+
   it('formats arrays and stack/queue items cleanly', () => {
     expect(formatSnapshotValue([1, 2, 3])).toBe('[1, 2, 3]');
     expect(formatSnapshotValue([1, 2, 3, 4, 5, 6, 7])).toBe('[1, 2, 3, ... (7 items)]');
+  });
+
+  it('formats objects and maps cleanly', () => {
+    expect(formatSnapshotValue({})).toBe('{}');
+    expect(formatSnapshotValue({ a: 1, b: 2 })).toBe('{ a: 1, b: 2 }');
+    expect(formatSnapshotValue({ a: 1, b: 2, c: 3, d: 4, e: 5 })).toBe('{ a: 1, b: 2, ... (5 keys) }');
   });
 
   it('serializes tree return values into array format', () => {

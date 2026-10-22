@@ -101,7 +101,7 @@ const TreeCanvas: React.FC<TreeCanvasProps> = ({ step, treeStructure, config }) 
     const LEVEL_HEIGHT = 85;
     const X_SPACING = 80;
     const START_X = 120; // 120px left margin ensures pills and badges are never clipped
-    const START_Y = 65;
+    const START_Y = 75; // 75px top margin ensures floating active tags never clip top boundary
     let nextX = 0;
 
     // In-order traversal produces natural left-to-right horizontal coordinates
@@ -140,8 +140,8 @@ const TreeCanvas: React.FC<TreeCanvasProps> = ({ step, treeStructure, config }) 
 
     layoutSubtree(rootId, 0, null);
 
-    const maxX = Math.max(...layoutList.map((n) => n.x), 260) + 120;
-    const maxY = Math.max(...layoutList.map((n) => n.y), 180) + 100;
+    const maxX = Math.max(...layoutList.map((n) => n.x), 260) + 140;
+    const maxY = Math.max(...layoutList.map((n) => n.y), 180) + 120;
 
     return {
       layoutNodes: layoutList,

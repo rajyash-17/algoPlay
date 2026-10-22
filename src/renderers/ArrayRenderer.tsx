@@ -65,7 +65,7 @@ export const ArrayRenderer: React.FC<ArrayRendererProps> = ({ step, config }) =>
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-6 bg-surface border-3 border-ink rounded-lg shadow-standard overflow-x-auto min-h-[300px]">
+    <div className="w-full flex flex-col items-center p-6 bg-surface border-3 border-ink rounded-lg shadow-standard overflow-x-auto min-h-[300px]">
       {/* Array name badge */}
       <div className="self-start mb-6 flex items-center gap-2">
         <span className="bg-ink text-primary font-mono text-xs font-bold px-2 py-0.5 rounded">
@@ -76,8 +76,8 @@ export const ArrayRenderer: React.FC<ArrayRendererProps> = ({ step, config }) =>
         </span>
       </div>
 
-      {/* Main visualization row */}
-      <div className="relative flex items-end justify-center gap-3 pt-12 pb-8">
+      {/* Main visualization row - Centered with m-auto, generous top clearance for stacked pointers, and safe overflow scrolling */}
+      <div className="relative flex items-end gap-3 pt-20 pb-8 px-8 m-auto flex-nowrap">
         {values.map((val, idx) => {
           const pointers = pointersByIndex.get(idx) ?? [];
           const cellRole = cellRolesByIndex.get(idx);

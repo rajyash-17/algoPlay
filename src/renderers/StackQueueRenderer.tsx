@@ -109,7 +109,7 @@ export const StackQueueRenderer: React.FC<StackQueueRendererProps> = ({ step, co
           </div>
 
           {/* Stack Bucket Container with open top */}
-          <div className="w-36 min-h-[200px] max-h-[320px] bg-canvas border-b-4 border-x-4 border-ink rounded-b-xl p-3 flex flex-col-reverse gap-2 overflow-y-auto shadow-inner">
+          <div className="w-44 sm:w-52 min-h-[220px] max-h-[360px] bg-canvas border-b-4 border-x-4 border-ink rounded-b-xl p-3 flex flex-col-reverse gap-2 overflow-y-auto shadow-inner">
             <AnimatePresence mode="popLayout">
               {items.length === 0 ? (
                 <div className="m-auto text-center font-mono text-xs text-ink-subtle italic">
@@ -125,12 +125,17 @@ export const StackQueueRenderer: React.FC<StackQueueRendererProps> = ({ step, co
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -30, scale: 0.8 }}
                       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                      className={`w-full py-2.5 rounded-lg border-3 border-ink shadow-sm flex items-center justify-between px-3 font-mono ${
+                      className={`w-full py-2.5 rounded-lg border-3 border-ink shadow-sm flex items-center justify-between px-3 font-mono shrink-0 ${
                         isTop ? 'bg-primary text-ink font-black' : 'bg-surface text-ink font-bold'
                       }`}
                     >
                       <span className="text-xs text-ink-muted">[{idx}]</span>
-                      <span className="text-sm font-black">{String(val)}</span>
+                      <span
+                        className="text-sm font-black truncate max-w-[110px] sm:max-w-[140px]"
+                        title={String(val)}
+                      >
+                        {String(val)}
+                      </span>
                     </motion.div>
                   );
                 })

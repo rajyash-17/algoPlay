@@ -1,6 +1,6 @@
 /**
  * Human-readable snapshot value formatting for AlgoPlay.
- * Prevents recursive JSON dumps of pointer-based structures (Trees, Linked Lists)
+ * Prevents recursive JSON dumps of pointer-based structures (Trees, Linked Lists, Graphs)
  * and formats variables into crisp, concise educational tokens.
  */
 
@@ -9,20 +9,38 @@ import { listToArray, treeToLevelOrder, ListNode, TreeNode } from './builders';
 export function isTreeNode(val: unknown): boolean {
   if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
   const obj = val as Record<string, unknown>;
-  return 'val' in obj && ('left' in obj || 'right' in obj);
+  return ('val' in obj || 'value' in obj) && ('left' in obj || 'right' in obj);
 }
 
 export function isListNode(val: unknown): boolean {
   if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
   const obj = val as Record<string, unknown>;
-  return 'val' in obj && 'next' in obj;
+  return ('val' in obj || 'value' in obj) && 'next' in obj;
+}
+
+export function isGraphNode(val: unknown): boolean {
+  if (!val || typeof val !== 'object' || Array.isArray(val)) return false;
+  const obj = val as Record<string, unknown>;
+  return ('val' in obj || 'value' in obj) && 'neighbors' in obj;
 }
 
 export function formatSnapshotValue(val: unknown): string {
   if (val === null) return 'null';
   if (val === undefined) return 'undefined';
   if (typeof val === 'number' || typeof val === 'boolean') return String(val);
-  if (typeof val === 'string') return `"${val}"`;
+
+  if (typeof val === 'function') return 'ƒ()';
+
+  if (typeof val === 'string') {
+    if (val === '[Circular]') return '[Circular]';
+    if (val.startsWith('function ') || val.startsWith('class ') || val.includes('=>')) {
+      return 'ƒ()';
+    }
+    if (val.length > 24) {
+      return `"${val.slice(0, 22)}..."`;
+    }
+    return `"${val}"`;
+  }
 
   // Array formatting
   if (Array.isArray(val)) {
@@ -40,28 +58,34 @@ export function formatSnapshotValue(val: unknown): string {
 
     // Tree Node: format as Node(val) instead of recursive subtree dump
     if (isTreeNode(obj)) {
-      const nodeVal = obj.val !== undefined ? formatSnapshotValue(obj.val) : '?';
-      return `Node(${nodeVal})`;
+      const nodeVal = obj.val !== undefined ? obj.val : obj.value;
+      return `Node(${nodeVal !== undefined ? formatSnapshotValue(nodeVal) : '?'})`;
     }
 
     // Linked List Node: format as Node(val) instead of recursive list dump
     if (isListNode(obj)) {
-      const nodeVal = obj.val !== undefined ? formatSnapshotValue(obj.val) : '?';
-      return `Node(${nodeVal})`;
+      const nodeVal = obj.val !== undefined ? obj.val : obj.value;
+      return `Node(${nodeVal !== undefined ? formatSnapshotValue(nodeVal) : '?'})`;
     }
 
-    // Generic node object with 'val'
-    if ('val' in obj && Object.keys(obj).length <= 4) {
-      return `Node(${formatSnapshotValue(obj.val)})`;
+    // Graph Node: format as Node(val)
+    if (isGraphNode(obj)) {
+      const nodeVal = obj.val !== undefined ? obj.val : obj.value;
+      return `Node(${nodeVal !== undefined ? formatSnapshotValue(nodeVal) : '?'})`;
+    }
+
+    // Single-field wrapper or generic node
+    const keys = Object.keys(obj).filter((k) => !k.startsWith('__'));
+    if (keys.length === 1 && (keys[0] === 'val' || keys[0] === 'value')) {
+      return `Node(${formatSnapshotValue(obj[keys[0]])})`;
     }
 
     // Plain Map or Object: compact key-value display
-    const keys = Object.keys(obj).filter((k) => !k.startsWith('__'));
     if (keys.length === 0) return '{}';
     if (keys.length <= 3) {
       return `{ ${keys.map((k) => `${k}: ${formatSnapshotValue(obj[k])}`).join(', ')} }`;
     }
-    return `{ ${keys.slice(0, 2).map((k) => `${k}: ${formatSnapshotValue(obj[k])}`).join(', ')}, ... }`;
+    return `{ ${keys.slice(0, 2).map((k) => `${k}: ${formatSnapshotValue(obj[k])}`).join(', ')}, ... (${keys.length} keys) }`;
   }
 
   return String(val);
@@ -95,5 +119,9 @@ export function formatReturnValue(val: unknown): string {
     }
   }
 
-  return JSON.stringify(val);
+  try {
+    return JSON.stringify(val);
+  } catch {
+    return formatSnapshotValue(val);
+  }
 }

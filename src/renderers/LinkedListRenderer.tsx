@@ -47,7 +47,7 @@ export const LinkedListRenderer: React.FC<LinkedListRendererProps> = ({ step, co
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-6 bg-surface border-3 border-ink rounded-lg shadow-standard overflow-x-auto min-h-[320px]">
+    <div className="w-full flex flex-col items-center p-6 bg-surface border-3 border-ink rounded-lg shadow-standard overflow-x-auto min-h-[320px]">
       {/* Header Info */}
       <div className="self-start mb-6 flex items-center gap-3">
         <span className="bg-ink text-primary font-mono text-xs font-bold px-2 py-0.5 rounded">
@@ -64,8 +64,8 @@ export const LinkedListRenderer: React.FC<LinkedListRendererProps> = ({ step, co
         )}
       </div>
 
-      {/* Nodes and Edges Row */}
-      <div className="relative flex items-center justify-center gap-2 pt-14 pb-12 flex-wrap sm:flex-nowrap">
+      {/* Nodes and Edges Row - Centered with m-auto, ample top clearance for pointer tags, and no clipping on overflow */}
+      <div className="relative flex items-center gap-2 pt-20 pb-12 px-8 m-auto flex-nowrap">
         {nodes.map((node, idx) => {
           const pointers = pointersByNodeId.get(node.id) ?? [];
           const isCycleTarget = llStructure.cycleTargetId === node.id;

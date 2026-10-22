@@ -23,7 +23,12 @@ export const CaptionBar: React.FC<CaptionBarProps> = ({ step }) => {
 
   // Filter and format active variables cleanly
   const varEntries = Object.entries(step.vars)
-    .filter(([key]) => !key.startsWith('__'))
+    .filter(([key, val]) => {
+      if (key.startsWith('__')) return false;
+      if (typeof val === 'function') return false;
+      if (typeof val === 'string' && (val.startsWith('function ') || val.startsWith('class ') || val.includes('=>'))) return false;
+      return true;
+    })
     .map(([name, val]) => ({
       name,
       displayValue: formatSnapshotValue(val),
@@ -65,7 +70,7 @@ export const CaptionBar: React.FC<CaptionBarProps> = ({ step }) => {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col gap-1.5">
+      <div className="flex-1 flex flex-col gap-1.5 min-w-0">
         <div className="flex items-center justify-between">
           <span className="font-mono text-xs font-black text-ink uppercase tracking-wide flex items-center gap-1.5">
             <span>{isExplanation ? 'EXPLANATION' : 'STEP STATE'}</span>
@@ -86,10 +91,13 @@ export const CaptionBar: React.FC<CaptionBarProps> = ({ step }) => {
             {varEntries.map((v) => (
               <div
                 key={v.name}
-                className="flex items-center gap-1.5 bg-surface-muted px-2.5 py-1 rounded border-2 border-ink shadow-xs font-mono text-xs"
+                className="flex items-center gap-1.5 bg-surface-muted px-2.5 py-1 rounded border-2 border-ink shadow-xs font-mono text-xs max-w-full"
               >
-                <span className="font-bold text-ink-muted">{v.name}:</span>
-                <span className="font-black text-ink bg-surface px-1.5 py-0.5 rounded border border-ink/30">
+                <span className="font-bold text-ink-muted shrink-0">{v.name}:</span>
+                <span
+                  title={v.displayValue}
+                  className="font-black text-ink bg-surface px-1.5 py-0.5 rounded border border-ink/30 truncate max-w-[280px] sm:max-w-[420px]"
+                >
                   {v.displayValue}
                 </span>
               </div>
