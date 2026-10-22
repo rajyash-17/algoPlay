@@ -2,9 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { usePlayerStore } from '@/lib/playerStore';
-import { Play, Pause, SkipBack, SkipForward, RotateCcw, Minus, Plus } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, Gauge } from 'lucide-react';
 
-const PRESET_SPEEDS = [0.25, 0.5, 0.75, 1, 1.5, 2, 4];
+const PRESET_SPEEDS = [0.1, 0.25, 0.5, 0.75, 1.0];
 
 export const PlayerControls: React.FC = () => {
   const {
@@ -25,12 +25,11 @@ export const PlayerControls: React.FC = () => {
   const totalSteps = steps.length;
   const hasSteps = totalSteps > 0;
 
-  // Playback timer loop: lower speed = slower interval, higher speed = faster interval
+  // Playback timer loop: speed ranges from 0.1x (slowest, 7500ms) to 1.0x (normal, 750ms)
   useEffect(() => {
     if (!isPlaying || !hasSteps) return;
 
-    // Base interval at 1x is 800ms
-    const intervalMs = Math.max(50, Math.round(800 / speed));
+    const intervalMs = Math.max(100, Math.round(750 / speed));
     const timer = setInterval(() => {
       const state = usePlayerStore.getState();
       if (state.currentStepIndex >= state.steps.length - 1) {
@@ -70,16 +69,6 @@ export const PlayerControls: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlay, stepForward, stepBackward, restart]);
 
-  const decreaseSpeed = () => {
-    const nextSpeed = Math.max(0.1, Math.round((speed - 0.25) * 100) / 100);
-    setSpeed(nextSpeed);
-  };
-
-  const increaseSpeed = () => {
-    const nextSpeed = Math.min(5, Math.round((speed + 0.25) * 100) / 100);
-    setSpeed(nextSpeed);
-  };
-
   return (
     <div className="w-full bg-surface border-3 border-ink rounded-lg shadow-standard p-4 flex flex-col gap-3">
       {/* Scrubber timeline */}
@@ -101,8 +90,8 @@ export const PlayerControls: React.FC = () => {
         </div>
       </div>
 
-      {/* Control buttons & speed toggles */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Control buttons & speed slider */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Playback action buttons */}
         <div className="flex items-center gap-2">
           {/* Restart */}
@@ -156,42 +145,51 @@ export const PlayerControls: React.FC = () => {
           </button>
         </div>
 
-        {/* Speed Controls: Slower (0.25x) to Faster (4x) with fine adjustments */}
-        <div className="flex items-center gap-1.5 bg-surface-muted p-1 border-2 border-ink rounded shadow-sm">
-          <button
-            onClick={decreaseSpeed}
-            title="Decrease speed"
-            className="p-1 border border-ink bg-surface hover:bg-canvas rounded font-bold"
-          >
-            <Minus className="w-3 h-3 text-ink" />
-          </button>
+        {/* Speed Slider (0.1x to 1.0x) */}
+        <div className="flex items-center gap-3 bg-surface-muted px-3 py-1.5 border-2 border-ink rounded-lg shadow-sm">
+          <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-ink">
+            <Gauge className="w-3.5 h-3.5 text-ink" />
+            <span>SPEED:</span>
+            <span className="bg-primary px-1.5 py-0.5 rounded border border-ink text-ink font-black min-w-[42px] text-center">
+              {speed.toFixed(2)}x
+            </span>
+          </div>
 
-          <div className="flex items-center gap-1 overflow-x-auto max-w-[260px] sm:max-w-none">
-            {PRESET_SPEEDS.map((rate) => {
-              const isActive = speed === rate;
+          {/* Slider input 0.1x to 1.0x */}
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[10px] font-bold text-ink-muted">0.1x</span>
+            <input
+              type="range"
+              min={0.1}
+              max={1.0}
+              step={0.05}
+              value={speed}
+              onChange={(e) => setSpeed(Math.round(parseFloat(e.target.value) * 100) / 100)}
+              aria-label="Speed slider from 0.1x to 1.0x"
+              className="w-24 sm:w-32 h-2.5 bg-canvas border border-ink rounded-none appearance-none cursor-pointer accent-secondary"
+            />
+            <span className="font-mono text-[10px] font-bold text-ink-muted">1.0x</span>
+          </div>
+
+          {/* Quick Preset Buttons */}
+          <div className="hidden sm:flex items-center gap-1 pl-1 border-l border-ink/20">
+            {PRESET_SPEEDS.map((preset) => {
+              const isSelected = Math.abs(speed - preset) < 0.02;
               return (
                 <button
-                  key={rate}
-                  onClick={() => setSpeed(rate)}
-                  className={`px-1.5 py-0.5 font-mono text-xs font-bold rounded border ${
-                    isActive
+                  key={preset}
+                  onClick={() => setSpeed(preset)}
+                  className={`px-1.5 py-0.5 font-mono text-[10px] font-bold rounded border transition-all ${
+                    isSelected
                       ? 'bg-secondary text-ink border-ink shadow-sm'
-                      : 'bg-transparent text-ink border-transparent hover:bg-surface'
+                      : 'bg-surface text-ink border-transparent hover:border-ink/40'
                   }`}
                 >
-                  {rate}x
+                  {preset}x
                 </button>
               );
             })}
           </div>
-
-          <button
-            onClick={increaseSpeed}
-            title="Increase speed"
-            className="p-1 border border-ink bg-surface hover:bg-canvas rounded font-bold"
-          >
-            <Plus className="w-3 h-3 text-ink" />
-          </button>
         </div>
       </div>
     </div>
