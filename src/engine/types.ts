@@ -32,6 +32,7 @@ export interface LinkedListNodeSnapshot {
   val: Snapshot;
   nextId: string | null;
   randomId?: string | null;
+  isDetached?: boolean;
 }
 
 export interface LinkedListStructureSnapshot extends BaseStructureSnapshot {

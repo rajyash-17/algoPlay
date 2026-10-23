@@ -158,7 +158,8 @@ export function extractStructureSnapshot(
   if (expectedType === 'linked-list') {
     if (!target || typeof target !== 'object') return null;
 
-    // Discover newly reachable nodes starting from target
+    // 1. Discover reachable nodes in linked traversal order starting from target (head)
+    const reachableNodes: object[] = [];
     const visitedSet = new Set<object>();
     let curr: unknown = target;
     let stepCount = 0;
@@ -176,20 +177,33 @@ export function extractStructureSnapshot(
         break;
       }
       visitedSet.add(rawNode);
+      reachableNodes.push(rawNode);
 
       const currObj = curr as { next?: unknown };
       curr = currObj.next;
     }
 
-    // Now snapshot all known nodes for this structure in deterministic order
+    // 2. Discover any newly referenced or detached nodes from registry
     const allKnownNodes = registry.getStructureNodes(name);
-    if (allKnownNodes.length === 0) return null;
+    if (allKnownNodes.length === 0 && reachableNodes.length === 0) return null;
+
+    // Ordered list: active connected chain from head first, then any detached nodes
+    const orderedNodes: Array<{ rawNode: object; isDetached: boolean }> = reachableNodes.map((n) => ({
+      rawNode: n,
+      isDetached: false,
+    }));
+
+    for (const rawNode of allKnownNodes) {
+      if (!visitedSet.has(rawNode)) {
+        orderedNodes.push({ rawNode, isDetached: true });
+      }
+    }
 
     const nodes: LinkedListNodeSnapshot[] = [];
     const targetRaw = (target as { __rawTarget?: object }).__rawTarget ?? (target as object);
     const headId = registry.getId(targetRaw, 'node');
 
-    for (const rawNode of allKnownNodes) {
+    for (const { rawNode, isDetached } of orderedNodes) {
       const nodeId = registry.getId(rawNode, 'node');
       const nodeObj = rawNode as { val?: unknown; value?: unknown; next?: unknown; random?: unknown };
       const val = nodeObj.val !== undefined ? nodeObj.val : nodeObj.value;
@@ -211,6 +225,7 @@ export function extractStructureSnapshot(
         val: createSnapshot(val),
         nextId,
         randomId,
+        isDetached,
       });
     }
 

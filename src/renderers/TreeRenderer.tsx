@@ -140,6 +140,24 @@ const TreeCanvas: React.FC<TreeCanvasProps> = ({ step, treeStructure, config }) 
 
     layoutSubtree(rootId, 0, null);
 
+    // Lay out any unlinked / staging nodes (e.g. during construct-binary-tree)
+    const visitedLayoutIds = new Set(layoutList.map((n) => n.id));
+    let orphanIndex = 0;
+    for (const n of nodes) {
+      if (!visitedLayoutIds.has(n.id)) {
+        const orphanX = START_X + (nextX + orphanIndex) * X_SPACING;
+        layoutList.push({
+          id: n.id,
+          val: String(n.val ?? ''),
+          x: orphanX,
+          y: START_Y,
+          leftId: n.leftId,
+          rightId: n.rightId,
+        });
+        orphanIndex++;
+      }
+    }
+
     const maxX = Math.max(...layoutList.map((n) => n.x), 260) + 140;
     const maxY = Math.max(...layoutList.map((n) => n.y), 180) + 120;
 
@@ -254,7 +272,7 @@ const TreeCanvas: React.FC<TreeCanvasProps> = ({ step, treeStructure, config }) 
       </div>
 
       {/* Main Interactive Tree Canvas with Zoom Scale */}
-      <div className="w-full flex-1 overflow-x-auto overflow-y-visible flex items-center justify-center py-4">
+      <div className="w-full flex-1 overflow-x-auto overflow-y-auto max-h-[580px] flex items-center justify-center py-4">
         <div
           className="relative transition-transform duration-200 ease-out select-none"
           style={{

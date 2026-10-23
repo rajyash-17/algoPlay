@@ -129,7 +129,9 @@ export const ArrayRenderer: React.FC<ArrayRendererProps> = ({ step, config }) =>
               <motion.div
                 layout
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                className={`w-14 h-16 flex items-center justify-center font-mono text-xl font-black rounded-lg border-3 shadow-standard select-none ${bgClass} ${borderClass}`}
+                className={`min-w-14 px-2 h-16 flex items-center justify-center font-mono font-black rounded-lg border-3 shadow-standard select-none ${
+                  String(val ?? '').length > 3 ? 'text-sm' : 'text-xl'
+                } ${bgClass} ${borderClass}`}
               >
                 {String(val ?? '')}
               </motion.div>

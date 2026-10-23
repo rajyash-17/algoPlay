@@ -4,6 +4,8 @@ export const rendererConfig: RendererConfig = {
   primaryStructure: 'dummyHead',
   structures: [
     { name: 'dummyHead', type: 'linked-list', label: 'Merged List' },
+    { name: 'list1', type: 'linked-list', label: 'List 1' },
+    { name: 'list2', type: 'linked-list', label: 'List 2' },
   ],
   roleMappings: [
     { variable: 'curr', role: 'pointer', label: 'curr' },

@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { getCleanDisplayCode } from '@/lib/codeFormatter';
 import { SupportedLanguage, MULTI_LANG_SOLUTIONS } from '@/problems/multiLanguage';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Play } from 'lucide-react';
 
 interface CodePanelProps {
   rawCode: string;
@@ -12,6 +12,59 @@ interface CodePanelProps {
 }
 
 const LANGUAGES: SupportedLanguage[] = ['JavaScript', 'TypeScript', 'Python', 'Java', 'C++'];
+
+const KEYWORDS = new Set([
+  'function', 'return', 'const', 'let', 'var', 'if', 'else', 'while', 'for',
+  'def', 'class', 'import', 'export', 'new', 'this', 'public', 'private', 'static',
+  'try', 'catch', 'finally', 'continue', 'break', 'in', 'of', 'from', 'as', 'pass',
+  'and', 'or', 'not', 'is', 'elif', 'auto', 'struct', 'nullptr'
+]);
+
+const TYPES = new Set([
+  'int', 'boolean', 'bool', 'void', 'string', 'vector', 'ListNode', 'TreeNode',
+  'Map', 'Set', 'double', 'float', 'long', 'char', 'String', 'Integer', 'Boolean'
+]);
+
+const LITERALS = new Set(['true', 'false', 'null', 'undefined', 'None', 'nullptr']);
+
+function renderHighlightedTokens(lineText: string): React.ReactNode {
+  if (!lineText) return ' ';
+
+  // Fast check for whole-line comment
+  const trimmed = lineText.trim();
+  if (trimmed.startsWith('//') || trimmed.startsWith('#')) {
+    return <span className="text-slate-500 italic font-medium">{lineText}</span>;
+  }
+
+  // Regex tokenizing into strings, identifiers, numbers, and symbols
+  const tokenRegex = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\/\/[^\n]*|#[^\n]*|[a-zA-Z_$][a-zA-Z0-9_$]*|\b\d+\b|[^\s\w]+|\s+)/g;
+  const parts: React.ReactNode[] = [];
+  let match: RegExpExecArray | null;
+  let idx = 0;
+
+  while ((match = tokenRegex.exec(lineText)) !== null) {
+    const token = match[0];
+    const key = `${idx++}_${token}`;
+
+    if (!token) continue;
+
+    if (token.startsWith('"') || token.startsWith("'")) {
+      parts.push(<span key={key} className="text-emerald-700 font-semibold">{token}</span>);
+    } else if (token.startsWith('//') || token.startsWith('#')) {
+      parts.push(<span key={key} className="text-slate-500 italic font-medium">{token}</span>);
+    } else if (KEYWORDS.has(token)) {
+      parts.push(<span key={key} className="text-purple-700 font-black">{token}</span>);
+    } else if (TYPES.has(token)) {
+      parts.push(<span key={key} className="text-teal-700 font-bold">{token}</span>);
+    } else if (LITERALS.has(token) || /^\d+$/.test(token)) {
+      parts.push(<span key={key} className="text-amber-700 font-bold">{token}</span>);
+    } else {
+      parts.push(<span key={key} className="text-ink font-medium">{token}</span>);
+    }
+  }
+
+  return parts.length > 0 ? parts : lineText;
+}
 
 export const CodePanel: React.FC<CodePanelProps> = ({ rawCode, currentLine, slug }) => {
   const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('JavaScript');
@@ -36,7 +89,9 @@ export const CodePanel: React.FC<CodePanelProps> = ({ rawCode, currentLine, slug
     return cleanJsCode;
   }, [langImpl, cleanJsCode]);
 
-  const lines = displayedCode.trim().split('\n');
+  const lines = useMemo(() => {
+    return displayedCode.replace(/\r\n/g, '\n').trimEnd().split('\n');
+  }, [displayedCode]);
 
   // Compute active line for the selected language
   const mappedDisplayLine = useMemo(() => {
@@ -47,16 +102,17 @@ export const CodePanel: React.FC<CodePanelProps> = ({ rawCode, currentLine, slug
 
     // 2. If JavaScript, return clean JS line
     if (selectedLanguage === 'JavaScript') {
-      return cleanJsLine;
+      return Math.min(cleanJsLine, lines.length);
     }
 
     // 3. For any other language (Python, Java, C++, TypeScript), use its dedicated lineMap
     if (langImpl?.lineMap) {
-      return langImpl.lineMap[cleanJsLine] ?? cleanJsLine;
+      const target = langImpl.lineMap[cleanJsLine] ?? cleanJsLine;
+      return Math.min(target, lines.length);
     }
 
-    return cleanJsLine;
-  }, [currentLine, rawToDisplayLine, selectedLanguage, langImpl]);
+    return Math.min(cleanJsLine, lines.length);
+  }, [currentLine, rawToDisplayLine, selectedLanguage, langImpl, lines.length]);
 
   // Smoothly scroll active line into view
   useEffect(() => {
@@ -98,13 +154,13 @@ export const CodePanel: React.FC<CodePanelProps> = ({ rawCode, currentLine, slug
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-ink font-bold">
+          <span className="font-mono text-xs text-ink font-bold bg-surface-muted px-2 py-0.5 rounded border border-ink/20">
             {mappedDisplayLine ? `Line ${mappedDisplayLine}` : 'Ready'}
           </span>
         </div>
       </div>
 
-      {/* Code content */}
+      {/* Code content with Syntax Highlighting and Synced Line Gutter */}
       <div className="flex-1 overflow-auto p-3 font-mono text-xs sm:text-sm leading-6 bg-surface">
         {lines.map((lineText, index) => {
           const lineNumber = index + 1;
@@ -114,24 +170,27 @@ export const CodePanel: React.FC<CodePanelProps> = ({ rawCode, currentLine, slug
             <div
               key={lineNumber}
               ref={isActive ? activeLineRef : null}
-              className={`flex items-center px-2 py-0.5 rounded transition-colors ${
+              className={`flex items-center px-2 py-0.5 rounded transition-all ${
                 isActive
-                  ? 'bg-primary text-ink font-bold border-l-4 border-ink shadow-sm'
+                  ? 'bg-primary/25 text-ink font-bold border-l-4 border-ink shadow-xs'
                   : 'text-ink hover:bg-surface-muted/60'
               }`}
             >
-              {/* Line number gutter */}
+              {/* Line number gutter with active pointer indicator */}
               <span
-                className={`w-8 select-none text-right pr-3 shrink-0 ${
-                  isActive ? 'text-ink font-extrabold' : 'text-ink-subtle'
+                className={`w-9 select-none text-right pr-2.5 shrink-0 font-mono text-xs flex items-center justify-end gap-1 ${
+                  isActive ? 'text-ink font-black' : 'text-ink-subtle font-medium'
                 }`}
               >
-                {lineNumber}
+                {isActive && (
+                  <Play className="w-2.5 h-2.5 fill-ink text-ink animate-pulse" />
+                )}
+                <span>{lineNumber}</span>
               </span>
 
-              {/* Code line */}
-              <pre className="font-mono overflow-x-visible whitespace-pre">
-                {lineText || ' '}
+              {/* Code line with rich syntax highlighting */}
+              <pre className="font-mono overflow-x-visible whitespace-pre pl-1">
+                {renderHighlightedTokens(lineText)}
               </pre>
             </div>
           );

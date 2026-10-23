@@ -232,6 +232,18 @@ export function instrumentCode(sourceCode: string, options: InstrumentOptions = 
           continue;
         }
 
+        // Do not inject __line before note() calls - note() attaches explanation metadata
+        // to execution steps without creating duplicate ghost steps
+        if (
+          t.isExpressionStatement(stmt) &&
+          t.isCallExpression(stmt.expression) &&
+          t.isIdentifier(stmt.expression.callee) &&
+          stmt.expression.callee.name === 'note'
+        ) {
+          newBody.push(stmt);
+          continue;
+        }
+
         const line = stmt.loc ? stmt.loc.start.line : 1;
         const lineCall = t.expressionStatement(
           t.callExpression(t.identifier('__line'), [t.numericLiteral(line)])

@@ -36,6 +36,7 @@ export default function ProblemPage() {
   } = usePlayerStore();
 
   const currentStep = getCurrentStep();
+  const prevStep = currentStepIndex > 0 && traceResult ? traceResult.steps[currentStepIndex - 1] ?? null : null;
 
   // Load and execute trace on problem or input change
   useEffect(() => {
@@ -247,8 +248,8 @@ export default function ProblemPage() {
             <RendererHost step={currentStep} config={rendererConfig} />
           </div>
 
-          {/* Step Narrative Caption */}
-          <CaptionBar step={currentStep} />
+          {/* Dynamic Caption Bar with Auto-Step State, Note display, and Variable Diffing */}
+          <CaptionBar step={currentStep} prevStep={prevStep} />
 
           {/* Return Value / Execution Result Banner if finished */}
           {traceResult && currentStepIndex === traceResult.steps.length - 1 && (

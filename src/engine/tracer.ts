@@ -226,7 +226,19 @@ export class Tracer {
 
     if (this.rendererConfig?.structures) {
       for (const structDef of this.rendererConfig.structures) {
-        const raw = this.trackedStructures.get(structDef.name) ?? this.currentVars.get(structDef.name);
+        let raw = this.trackedStructures.get(structDef.name) ?? this.currentVars.get(structDef.name);
+
+        // Fallback for linked lists: if structDef.name (e.g. dummyHead) is not yet initialized at function entry,
+        // fall back to any active linked list parameter (e.g. head, list1, l1) so the list is visible from step 1
+        if (!raw && structDef.type === 'linked-list') {
+          for (const [, varVal] of this.currentVars.entries()) {
+            if (varVal && typeof varVal === 'object' && ('next' in varVal || 'val' in varVal)) {
+              raw = varVal;
+              break;
+            }
+          }
+        }
+
         const snapshot = extractStructureSnapshot(structDef.name, raw, structDef.type, this.nodeRegistry);
         if (snapshot) {
           if (snapshot.type === 'tree') {
