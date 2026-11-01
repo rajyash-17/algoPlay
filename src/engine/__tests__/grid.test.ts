@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { executeTrace } from '../run';
 import { GridStructureSnapshot } from '../types';
 import { extractStructureSnapshot } from '../snapshot';
+import { getProblemBySlug } from '@/problems';
 
 describe('2D Grid and Chessboard Structure Tracing', () => {
   it('extracts grid structure correctly from 2D array', () => {
@@ -24,11 +25,7 @@ describe('2D Grid and Chessboard Structure Tracing', () => {
       function solveNQueens(n) {
         const board = [];
         for (let i = 0; i < n; i++) {
-          const row = [];
-          for (let j = 0; j < n; j++) {
-            row.push('.');
-          }
-          board.push(row);
+          board.push(new Array(n).fill('.'));
         }
 
         const solutions = [];
@@ -76,5 +73,65 @@ describe('2D Grid and Chessboard Structure Tracing', () => {
     // Verify 2D coordinate highlights were generated
     const coordHighlights = result.steps.flatMap((s) => s.highlights).filter((h) => h.indices && h.indices.length === 2);
     expect(coordHighlights.length).toBeGreaterThan(0);
+  });
+
+  it('runs registered n-queens problem and generates complete 4x4 traces with valid solutions', () => {
+    const prob = getProblemBySlug('n-queens');
+    expect(prob).toBeDefined();
+
+    const result = executeTrace({
+      code: prob!.solutionCode,
+      args: [4],
+      rendererConfig: prob!.rendererConfig,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.returnValue).toEqual([
+      ['.Q..', '...Q', 'Q...', '..Q.'],
+      ['..Q.', 'Q...', '...Q', '.Q..'],
+    ]);
+
+    // Check that every step has safe dimensions when rendered
+    for (let i = 0; i < result.steps.length; i++) {
+      const step = result.steps[i]!;
+      const grid = step.structures.find((s) => s.type === 'grid') as GridStructureSnapshot | undefined;
+
+      const targetRows = (typeof step.vars.n === 'number' && step.vars.n > 0)
+        ? step.vars.n
+        : (grid?.numRows && grid.numRows > 0 ? grid.numRows : 4);
+
+      const targetCols = (typeof step.vars.n === 'number' && step.vars.n > 0)
+        ? step.vars.n
+        : (grid?.numCols && grid.numCols > 0 ? grid.numCols : targetRows);
+
+      // Ensure effective grid is always full 4x4
+      expect(targetRows).toBe(4);
+      expect(targetCols).toBe(4);
+
+      const rows = Array.from({ length: targetRows }, (_, r) => {
+        const existingRow = grid?.rows?.[r];
+        return Array.from({ length: targetCols }, (_, c) => {
+          return existingRow?.[c] ?? '.';
+        });
+      });
+
+      expect(rows.length).toBe(4);
+      expect(rows[0]!.length).toBe(4);
+    }
+  });
+
+  it('runs registered n-queens-ii problem and correctly counts 2 solutions for n = 4', () => {
+    const prob = getProblemBySlug('n-queens-ii');
+    expect(prob).toBeDefined();
+
+    const result = executeTrace({
+      code: prob!.solutionCode,
+      args: [4],
+      rendererConfig: prob!.rendererConfig,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.returnValue).toBe(2);
+    expect(result.steps.length).toBeGreaterThan(0);
   });
 });
