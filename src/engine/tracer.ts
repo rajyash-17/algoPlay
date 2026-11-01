@@ -296,6 +296,21 @@ export class Tracer {
           }
         }
       }
+
+      // Check if grid structure has active 2D coordinates (row and col)
+      const hasGrid = this.rendererConfig.structures.some((s) => s.type === 'grid');
+      if (hasGrid) {
+        const rowVal = this.currentVars.get('row') ?? this.currentVars.get('r');
+        const colVal = this.currentVars.get('col') ?? this.currentVars.get('c');
+        if (typeof rowVal === 'number' && typeof colVal === 'number' && Number.isInteger(rowVal) && Number.isInteger(colVal)) {
+          highlights.push({
+            target: primaryTarget,
+            indices: [rowVal, colVal],
+            role: 'pointer',
+            label: `(${rowVal}, ${colVal})`,
+          });
+        }
+      }
     }
 
     // Clear transient highlights for next line

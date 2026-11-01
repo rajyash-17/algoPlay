@@ -214,6 +214,40 @@ export default function ProblemPage() {
         )}
       </div>
 
+      {/* Assignment Focus Banner for N-Queens Assignment */}
+      {slug.startsWith('n-queens') && (
+        <div className="bg-accent/40 border-2 border-ink rounded-lg px-4 py-2.5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="bg-ink text-primary text-[10px] font-black uppercase px-2 py-0.5 rounded shadow-2xs">
+              ASSIGNMENT FOCUS
+            </span>
+            <span className="font-mono text-xs font-bold text-ink">
+              {slug === 'n-queens' ? 'Problem #51: N-Queens (Full Board Simulation)' : 'Problem #52: N-Queens II (Distinct Count)'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 font-mono text-xs font-bold">
+            <span className="text-ink-muted hidden sm:inline">Switch Assignment Task:</span>
+            <Link
+              href="/problems/n-queens"
+              className={`px-2 py-0.5 rounded border transition-all ${
+                slug === 'n-queens' ? 'bg-primary text-ink border-ink font-black shadow-xs' : 'bg-surface text-ink hover:bg-surface-muted'
+              }`}
+            >
+              #51 N-Queens
+            </Link>
+            <Link
+              href="/problems/n-queens-ii"
+              className={`px-2 py-0.5 rounded border transition-all ${
+                slug === 'n-queens-ii' ? 'bg-primary text-ink border-ink font-black shadow-xs' : 'bg-surface text-ink hover:bg-surface-muted'
+              }`}
+            >
+              #52 N-Queens II
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Main Problem Workspace with Dynamic Responsive Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 min-h-[460px]">
         {/* Left Column: Synchronized Multi-Language Code Viewer */}

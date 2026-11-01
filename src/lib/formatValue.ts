@@ -45,6 +45,10 @@ export function formatSnapshotValue(val: unknown): string {
   // Array formatting
   if (Array.isArray(val)) {
     if (val.length === 0) return '[]';
+    // Compact formatting for 2D boards / grids
+    if (Array.isArray(val[0]) && (val.length >= 3 || val[0].length >= 3)) {
+      return `Board(${val.length}x${val[0].length})`;
+    }
     if (val.length <= 4) {
       return `[${val.map((item) => formatSnapshotValue(item)).join(', ')}]`;
     }

@@ -174,6 +174,15 @@ import { meta as isValidBstMeta } from './validate-binary-search-tree/meta';
 import { inputs as isValidBstInputs } from './validate-binary-search-tree/inputs';
 import { rendererConfig as isValidBstRenderer } from './validate-binary-search-tree/renderer';
 
+// Backtracking Category (Assignment Focus)
+import { meta as nQueensMeta } from './n-queens/meta';
+import { inputs as nQueensInputs } from './n-queens/inputs';
+import { rendererConfig as nQueensRenderer } from './n-queens/renderer';
+
+import { meta as nQueensIIMeta } from './n-queens-ii/meta';
+import { inputs as nQueensIIInputs } from './n-queens-ii/inputs';
+import { rendererConfig as nQueensIIRenderer } from './n-queens-ii/renderer';
+
 export interface ProblemDefinition {
   meta: ProblemMeta;
   solutionCode: string;
@@ -1270,6 +1279,110 @@ const isValidBstCode = `function isValidBST(root) {
   return validate(root, null, null);
 }`;
 
+const nQueensCode = `function solveNQueens(n) {
+  const board = [];
+  for (let i = 0; i < n; i++) {
+    const row = [];
+    for (let j = 0; j < n; j++) {
+      row.push('.');
+    }
+    board.push(row);
+  }
+
+  const solutions = [];
+  const cols = new Set();
+  const diag1 = new Set();
+  const diag2 = new Set();
+
+  function backtrack(row) {
+    if (row === n) {
+      note("Found valid configuration! All " + n + " queens placed safely.");
+      const solution = [];
+      for (let i = 0; i < n; i++) {
+        solution.push(board[i].join(''));
+      }
+      solutions.push(solution);
+      return;
+    }
+
+    for (let col = 0; col < n; col++) {
+      const d1 = row - col;
+      const d2 = row + col;
+
+      if (cols.has(col) || diag1.has(d1) || diag2.has(d2)) {
+        continue;
+      }
+
+      note("Placing Queen at row " + row + ", col " + col);
+      board[row][col] = 'Q';
+      cols.add(col);
+      diag1.add(d1);
+      diag2.add(d2);
+
+      backtrack(row + 1);
+
+      note("Backtracking: remove Queen from row " + row + ", col " + col);
+      board[row][col] = '.';
+      cols.delete(col);
+      diag1.delete(d1);
+      diag2.delete(d2);
+    }
+  }
+
+  backtrack(0);
+  return solutions;
+}`;
+
+const nQueensIICode = `function totalNQueens(n) {
+  let count = 0;
+  const board = [];
+  for (let i = 0; i < n; i++) {
+    const row = [];
+    for (let j = 0; j < n; j++) {
+      row.push('.');
+    }
+    board.push(row);
+  }
+
+  const cols = new Set();
+  const diag1 = new Set();
+  const diag2 = new Set();
+
+  function backtrack(row) {
+    if (row === n) {
+      note("Valid placement found! Incrementing solutions count.");
+      count++;
+      return;
+    }
+
+    for (let col = 0; col < n; col++) {
+      const d1 = row - col;
+      const d2 = row + col;
+
+      if (cols.has(col) || diag1.has(d1) || diag2.has(d2)) {
+        continue;
+      }
+
+      note("Placing Queen at row " + row + ", col " + col);
+      board[row][col] = 'Q';
+      cols.add(col);
+      diag1.add(d1);
+      diag2.add(d2);
+
+      backtrack(row + 1);
+
+      note("Backtracking: remove Queen from row " + row + ", col " + col);
+      board[row][col] = '.';
+      cols.delete(col);
+      diag1.delete(d1);
+      diag2.delete(d2);
+    }
+  }
+
+  backtrack(0);
+  return count;
+}`;
+
 export const PROBLEMS: ProblemDefinition[] = [
   // Array Category
   {
@@ -1533,6 +1646,20 @@ export const PROBLEMS: ProblemDefinition[] = [
     solutionCode: isValidBstCode,
     inputs: isValidBstInputs,
     rendererConfig: isValidBstRenderer,
+  },
+
+  // Backtracking Category (Assignment Focus)
+  {
+    meta: nQueensMeta,
+    solutionCode: nQueensCode,
+    inputs: nQueensInputs,
+    rendererConfig: nQueensRenderer,
+  },
+  {
+    meta: nQueensIIMeta,
+    solutionCode: nQueensIICode,
+    inputs: nQueensIIInputs,
+    rendererConfig: nQueensIIRenderer,
   },
 ];
 

@@ -155,6 +155,26 @@ export function extractStructureSnapshot(
     };
   }
 
+  if (expectedType === 'grid' && Array.isArray(target)) {
+    const rows: Snapshot[][] = target.map((row) => {
+      if (Array.isArray(row)) {
+        return row.map((cell) => createSnapshot(cell));
+      }
+      if (typeof row === 'string') {
+        return row.split('').map((cell) => createSnapshot(cell));
+      }
+      return [createSnapshot(row)];
+    });
+    return {
+      id: name,
+      name,
+      type: 'grid',
+      rows,
+      numRows: rows.length,
+      numCols: rows[0]?.length ?? 0,
+    };
+  }
+
   if (expectedType === 'linked-list') {
     if (!target || typeof target !== 'object') return null;
 

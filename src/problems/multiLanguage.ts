@@ -7,6 +7,7 @@ export interface LanguageImplementation {
 }
 
 import { TREE_MULTI_LANG_SOLUTIONS } from './treeMultiLanguage';
+import { N_QUEENS_MULTI_LANG_SOLUTIONS } from './nQueensMultiLanguage';
 
 export const MULTI_LANG_SOLUTIONS: Record<string, Record<SupportedLanguage, LanguageImplementation>> = {
   'two-sum': {
@@ -2761,4 +2762,5 @@ export const MULTI_LANG_SOLUTIONS: Record<string, Record<SupportedLanguage, Lang
     },
   },
   ...TREE_MULTI_LANG_SOLUTIONS,
+  ...N_QUEENS_MULTI_LANG_SOLUTIONS,
 };

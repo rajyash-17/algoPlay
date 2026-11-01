@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { getAllProblems } from '@/problems';
-import { ArrowRight, Code2, Compass, Layers, GitBranch, Terminal, Trophy } from 'lucide-react';
+import { ArrowRight, Code2, Compass, Layers, GitBranch, Terminal, Trophy, Crown, Sparkles } from 'lucide-react';
 import { tokens } from '@/lib/tokens';
 
 export default function HomePage() {
@@ -23,6 +23,8 @@ export default function HomePage() {
 
   const getCategoryIcon = (category: string) => {
     switch (category.toLowerCase()) {
+      case 'backtracking':
+        return <Crown className="w-5 h-5" />;
       case 'stack':
         return <Layers className="w-5 h-5" />;
       case 'linked list':
@@ -59,6 +61,46 @@ export default function HomePage() {
           <span className="font-mono text-xs font-bold text-ink uppercase tracking-wider">
             Problems Active
           </span>
+        </div>
+      </div>
+
+      {/* Featured Assignment Showcase Card */}
+      <div className="bg-accent/30 border-3 border-ink rounded-xl p-5 sm:p-6 shadow-standard flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden">
+        <div className="flex flex-col gap-2 max-w-2xl z-10">
+          <div className="flex items-center gap-2">
+            <span className="bg-ink text-primary font-mono text-[10px] font-black uppercase px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
+              <Crown className="w-3 h-3 fill-primary text-primary" />
+              Coursework Assignment
+            </span>
+            <span className="font-mono text-xs font-bold text-ink-muted">
+              Backtracking & 2D Chessboard Simulation
+            </span>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-black font-mono text-ink flex items-center gap-2">
+            N-Queens Problem (#51 & #52)
+          </h2>
+
+          <p className="text-ink-muted text-xs sm:text-sm font-medium leading-relaxed">
+            Directly test and explore the N-Queens assignment with frame-by-frame chessboard animations, live queen placements, attack ray crosshairs, and multi-language backtracking solutions.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 z-10 shrink-0">
+          <Link
+            href="/problems/n-queens"
+            className="px-4 py-2 bg-primary hover:bg-primary-hover border-2 border-ink rounded-lg font-mono text-xs font-black text-ink shadow-standard hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none transition-all flex items-center gap-2"
+          >
+            <Crown className="w-4 h-4 fill-ink text-ink" />
+            <span>Launch #51 N-Queens</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            href="/problems/n-queens-ii"
+            className="px-3 py-2 bg-surface hover:bg-surface-muted border-2 border-ink rounded-lg font-mono text-xs font-bold text-ink shadow-sm hover:translate-x-[1px] hover:translate-y-[1px] active:shadow-none transition-all flex items-center gap-1.5"
+          >
+            <span>#52 N-Queens II</span>
+          </Link>
         </div>
       </div>
 
