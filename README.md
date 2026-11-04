@@ -71,59 +71,9 @@ The project is deployed and hosted on **Vercel**:
 
 ---
 
-## 🎨 Design System: "Neo-Brutalist Doodle & Arcade" Theme
+## 🎨 Theme
 
-AlgoPlay rejects sterile, generic corporate dashboards in favor of a signature **Neo-Brutalist Doodle with Retro Arcade Touches** design language.
-
-### Aesthetic Philosophy
-Traditional algorithm visualizers are either overly dry or visually noisy. Our theme combines:
-1. **High-Contrast Neo-Brutalism:** Heavy solid black borders (`2px`–`4px #121212`), high-contrast flat backgrounds, and hard zero-blur offset drop shadows create instantaneous visual clarity.
-2. **Playful Doodle Character:** Hand-drawn parchment textures, expressive badges, and friendly typography turn intimidating LeetCode problems into approachable, interactive puzzle toys.
-3. **Subtle Arcade Touches:** Level progression badges, confetti celebration on problem completion, and arcade-style HUD elements motivate learning without cluttering the visualization itself.
-
----
-
-### Color Palette Tokens
-All colors, borders, shadows, and typography are governed by a centralized design token system ([tokens.ts](file:///Users/rajyash/projects/algoPlay/src/lib/tokens.ts)):
-
-| Token | Hex | Role & Meaning |
-| :--- | :---: | :--- |
-| **Canvas** | `#FAF7F0` | Warm tactile newsprint background (replaces harsh sterile white) |
-| **Surface** | `#FFFFFF` | Crisp white card surface with hard drop shadows |
-| **Surface Muted** | `#F4EFE6` | Secondary panel backgrounds and code gutters |
-| **Doodle Ink** | `#121212` | Solid black outlines, primary typography, and pointer pills |
-| **Electric Canary** | `#FFE600` | **Primary Brand Color**: Active pointers, inspected cells, play triggers |
-| **Bubblegum Pink** | `#FF5E7E` | **Mutations**: Array swaps, modified elements, backtracked states |
-| **Neo-Cyan** | `#4DEEEA` | **Comparisons**: Evaluated elements, binary search midpoints |
-| **Mint Neon Green** | `#00F0A0` | **Success**: Placed queens, completed targets, valid states |
-| **Tangerine Orange** | `#FFA800` | **Alerts**: Medium difficulty, active ray scanning |
-| **Coral Red** | `#FF3366` | **Danger**: Hard difficulty, attack ray conflicts |
-| **Electric Lavender** | `#B388FF` | **Milestones**: Sliding window brackets, solved configurations |
-
----
-
-### Brutalist Geometry & Tactile Physics
-* **Zero-Blur Hard Shadows:** Unlike standard blurred CSS shadows, our elements use crisp, comic-style offset shadows:
-  ```css
-  box-shadow: 4px 4px 0px #121212;   /* Standard Card Shadow */
-  box-shadow: 6px 6px 0px #121212;   /* Heavy Modal / Board Shadow */
-  ```
-* **Mechanical Tactile Feedback:** Buttons physically depress into the canvas on interaction:
-  ```css
-  button:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0px #121212; }
-  button:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px #121212; }
-  ```
-* **Heavy Borders:** Consistent `2px solid #121212` up to `4px solid #121212` brutalist outlines on all components, nodes, and boards.
-
----
-
-### State-to-Color Pedagogical Mapping
-Every data structure renderer shares identical semantic colors:
-* 🟨 **Visited / Current Pointer:** Canary Yellow (`#FFE600`)
-* 🟦 **Compared / Read:** Neo-Cyan (`#4DEEEA`)
-* 🟥 **Modified / Swapped:** Bubblegum Pink (`#FF5E7E`)
-* 🟩 **Settled / Sorted / Target Match:** Mint Neon Green (`#00F0A0`)
-* 🟪 **Sliding Window / Solved Set:** Electric Lavender (`#B388FF`)
+AlgoPlay is designed in a **Neo-Brutalist Doodle & Retro Arcade** theme — featuring high-contrast colors, bold black borders, hard drop shadows, and playful gamified elements to make complex algorithm visualizations tactile, approachable, and fun to explore.
 
 ---
 
