@@ -28,7 +28,12 @@
 
 * **Team Name:** Team Cognova
 * **Project Track:** AI TEAM — Algorithm Animation & Interactive Education Engine
-* **Project Code:** AlgoPlay (`algoplay@0.1.0`)
+* **Project Code:** AlgoPlay
+* **Team Members:** RAJ YASH GUPTA (BTECH/15103/24)
+                    VERTIKA (BTECH/15111/24)
+                    ANJALI KUMARI (BTECH/15010/24)
+                    RAM KISHAN MEHTA (BTECH/15016/24)
+                    NISHANT KUMAR (BTECH/15130/24)
 
 ---
 
@@ -76,8 +81,8 @@ At each row $r$, the algorithm tests candidate column $c \in [0, N-1]$. If any r
 Rather than a static grid, we engineered a dedicated **`GridRenderer`** for board games and 2D arrays:
 1. **8-Direction Attack Rays:** When candidate square $(r, c)$ is evaluated, the visualizer casts soft amber attack rays along its row, column, and both diagonals to illustrate queen sightlines.
 2. **Real-time Conflict Crosshairs:**
-   * ⚔️ **Attacked Square:** Displays animated coral crosshairs with an alert badge (`⚔️ Conflict at (r, c)`) showing exactly which diagonal/column is threatened.
-   * ✓ **Safe Square:** Highlights in vibrant yellow with (`✓ Testing (r, c)`).
+   *  **Attacked Square:** Displays animated coral crosshairs with an alert badge (`⚔️ Conflict at (r, c)`) showing exactly which diagonal/column is threatened.
+   *  **Safe Square:** Highlights in vibrant yellow with (`✓ Testing (r, c)`).
 3. **Framer Motion Spring Physics:** Queens animate into position with spring bounce and rotation, and exit smoothly during backtracking.
 4. **Zoom & Pan Controls:** Built-in zoom controls (65% to 140%) to handle both small boards ($N=4$) and larger boards ($N=8+$).
 
