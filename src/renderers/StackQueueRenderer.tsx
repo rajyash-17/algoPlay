@@ -2,7 +2,13 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Step, RendererConfig, ArrayStructureSnapshot, StackStructureSnapshot, QueueStructureSnapshot } from '@/engine/types';
+import {
+  Step,
+  RendererConfig,
+  ArrayStructureSnapshot,
+  StackStructureSnapshot,
+  QueueStructureSnapshot,
+} from '@/engine/types';
 import { ArrowDown, Layers } from 'lucide-react';
 
 interface StackQueueRendererProps {
@@ -19,7 +25,7 @@ export const StackQueueRenderer: React.FC<StackQueueRendererProps> = ({ step, co
     );
   }
 
-  // Find all structures to render (supports dual stacks like min-stack)
+  // Find all structures to render (supports dual stacks like in min-stack)
   const targetDefs = config.structures.filter((s) => s.type === 'stack' || s.type === 'queue');
   const activeDefs = targetDefs.length > 0 ? targetDefs : [config.structures[0]!];
 
@@ -43,18 +49,45 @@ export const StackQueueRenderer: React.FC<StackQueueRendererProps> = ({ step, co
         {activeDefs.map((def) => {
           const isQueue = def.type === 'queue';
 
-          // Find structure snapshot or array in variables
-          const structSnapshot = step.structures.find(
-            (s) => s.name === def.name || s.type === (isQueue ? 'queue' : 'stack') || s.type === 'array'
-          );
+          // 1. Prioritize exact name match in step.structures
+          let structSnapshot = step.structures.find((s) => s.name === def.name);
+
+          // 2. If no exact name match, fallback if single structure of matching type
+          if (!structSnapshot && step.structures.length === 1) {
+            const first = step.structures[0]!;
+            if (first.type === (isQueue ? 'queue' : 'stack') || first.type === 'array') {
+              structSnapshot = first;
+            }
+          }
 
           let items: unknown[] = [];
           if (structSnapshot) {
-            if (structSnapshot.type === 'stack') items = (structSnapshot as StackStructureSnapshot).items;
-            else if (structSnapshot.type === 'queue') items = (structSnapshot as QueueStructureSnapshot).items;
-            else if (structSnapshot.type === 'array') items = (structSnapshot as ArrayStructureSnapshot).values;
-          } else if (Array.isArray(step.vars[def.name])) {
+            if (structSnapshot.type === 'stack') items = (structSnapshot as StackStructureSnapshot).items ?? [];
+            else if (structSnapshot.type === 'queue') items = (structSnapshot as QueueStructureSnapshot).items ?? [];
+            else if (structSnapshot.type === 'array') items = (structSnapshot as ArrayStructureSnapshot).values ?? [];
+          }
+
+          // 3. Fallback to step.vars[def.name] if structSnapshot was empty or missing
+          if (items.length === 0 && Array.isArray(step.vars[def.name])) {
             items = step.vars[def.name] as unknown[];
+          }
+
+          // 4. Fallback to any variable matching name or containing stack/queue
+          if (items.length === 0) {
+            for (const [vName, vVal] of Object.entries(step.vars)) {
+              if (
+                Array.isArray(vVal) &&
+                (vName.toLowerCase() === def.name.toLowerCase() ||
+                  (isQueue
+                    ? vName.toLowerCase().includes('queue')
+                    : vName.toLowerCase().includes('stack')))
+              ) {
+                if (vVal.length > 0) {
+                  items = vVal;
+                  break;
+                }
+              }
+            }
           }
 
           return (
@@ -81,7 +114,7 @@ export const StackQueueRenderer: React.FC<StackQueueRendererProps> = ({ step, co
                   <div className="flex items-center gap-2 p-3 bg-canvas border-y-3 border-ink rounded-lg min-h-[90px] w-full overflow-x-auto shadow-inner">
                     <AnimatePresence mode="popLayout">
                       {items.length === 0 ? (
-                        <div className="w-full text-center font-mono text-xs text-ink-subtle italic">
+                        <div className="w-full text-center font-mono text-xs text-ink-subtle italic py-3">
                           Queue is empty
                         </div>
                       ) : (
@@ -111,11 +144,16 @@ export const StackQueueRenderer: React.FC<StackQueueRendererProps> = ({ step, co
                   </div>
 
                   {/* Stack Bucket Container with open top */}
-                  <div className="w-44 sm:w-52 min-h-[220px] max-h-[360px] bg-canvas border-b-4 border-x-4 border-ink rounded-b-xl p-3 flex flex-col-reverse gap-2 overflow-y-auto shadow-inner">
+                  <div className="w-44 sm:w-56 min-h-[220px] max-h-[360px] bg-canvas border-b-4 border-x-4 border-ink rounded-b-xl p-3 flex flex-col-reverse gap-2 overflow-y-auto shadow-inner">
                     <AnimatePresence mode="popLayout">
                       {items.length === 0 ? (
-                        <div className="m-auto text-center font-mono text-xs text-ink-subtle italic">
-                          Stack is empty
+                        <div className="m-auto flex flex-col items-center justify-center p-3 text-center font-mono">
+                          <span className="text-xs text-ink-muted font-bold italic">
+                            Stack is empty
+                          </span>
+                          <span className="text-[10px] text-ink-subtle mt-1 max-w-[150px] leading-tight">
+                            Pushes occur when nested expressions, brackets, or values are parsed
+                          </span>
                         </div>
                       ) : (
                         items.map((val, idx) => {
@@ -127,8 +165,10 @@ export const StackQueueRenderer: React.FC<StackQueueRendererProps> = ({ step, co
                               animate={{ opacity: 1, y: 0, scale: 1 }}
                               exit={{ opacity: 0, y: -30, scale: 0.8 }}
                               transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                              className={`w-full py-2.5 rounded-lg border-3 border-ink shadow-sm flex items-center justify-between px-3 font-mono shrink-0 ${
-                                isTop ? 'bg-primary text-ink font-black' : 'bg-surface text-ink font-bold'
+                              className={`w-full py-2.5 rounded-lg border-3 border-ink shadow-sm flex items-center justify-between px-3 font-mono shrink-0 transition-all ${
+                                isTop
+                                  ? 'bg-primary text-ink font-black ring-2 ring-ink ring-offset-1'
+                                  : 'bg-surface text-ink font-bold'
                               }`}
                             >
                               <span className="text-xs text-ink-muted">[{idx}]</span>
