@@ -53,13 +53,12 @@
 * **Assignment Direct Route:** [https://algoplay-eta.vercel.app/assignment](https://algoplay-eta.vercel.app/assignment)
 
 ### Team Members
-| Name | Roll Number | Role |
-| :--- | :--- | :--- |
-| **RAJ YASH GUPTA** | `BTECH/15103/24` | Core Engine Architecture, Tracing Pipeline & State Machine |
-| **VERTIKA** | `BTECH/15111/24` | Multi-Language Solutions (JS, TS, Python, Java, C++) & Line Maps |
-| **ANJALI KUMARI** | `BTECH/15010/24` | Data Structure Renderers (Grid, Tree, Stack/Queue) |
-| **RAM KISHAN MEHTA** | `BTECH/15016/24` | Test Suite Verification & Benchmarking (Vitest) |
-| **NISHANT KUMAR** | `BTECH/15130/24` | Neo-Brutalist UI Design System, Tokens & Deployment |
+
+| **RAJ YASH GUPTA** | `BTECH/15103/24` 
+| **VERTIKA** | `BTECH/15111/24` 
+| **ANJALI KUMARI** | `BTECH/15010/24` 
+| **RAM KISHAN MEHTA** | `BTECH/15016/24` 
+| **NISHANT KUMAR** | `BTECH/15130/24`
 
 ---
 
