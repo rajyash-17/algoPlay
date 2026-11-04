@@ -11,7 +11,7 @@
 [![Assignment](https://img.shields.io/badge/Assignment-N--Queens%20%2351%20%26%20%2352-FFE600?style=for-the-badge&logo=crown&logoColor=black&labelColor=121212)](https://algoplay-eta.vercel.app/assignment)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2%20App%20Router-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20Mode-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Vitest](https://img.shields.io/badge/Tests-174%2F174%20Passing-00F0A0?style=for-the-badge&logo=vitest&logoColor=black&labelColor=121212)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-181%2F181%20Passing-00F0A0?style=for-the-badge&logo=vitest&logoColor=black&labelColor=121212)](https://vitest.dev/)
 
 [**🌐 Live Application**](https://algoplay-eta.vercel.app) • [**👑 Direct Assignment Page**](https://algoplay-eta.vercel.app/assignment) • [**📚 Problem Catalog**](https://algoplay-eta.vercel.app/#catalog)
 
@@ -53,12 +53,11 @@
 * **Assignment Direct Route:** [https://algoplay-eta.vercel.app/assignment](https://algoplay-eta.vercel.app/assignment)
 
 ### Team Members
-
-*| **RAJ YASH GUPTA** | `BTECH/15103/24` 
-*| **VERTIKA** | `BTECH/15111/24` 
-*| **ANJALI KUMARI** | `BTECH/15010/24` 
-*| **RAM KISHAN MEHTA** | `BTECH/15016/24` 
-*| **NISHANT KUMAR** | `BTECH/15130/24`
+* **RAJ YASH GUPTA** (`BTECH/15103/24`)
+* **VERTIKA** (`BTECH/15111/24`)
+* **ANJALI KUMARI** (`BTECH/15010/24`)
+* **RAM KISHAN MEHTA** (`BTECH/15016/24`)
+* **NISHANT KUMAR** (`BTECH/15130/24`)
 
 ---
 
@@ -328,7 +327,7 @@ npm install
 # Run the local development server
 npm run dev
 
-# Run all 174 test suites
+# Run all 181 test suites
 npm test
 
 # Verify strict TypeScript types (zero errors, no any)
