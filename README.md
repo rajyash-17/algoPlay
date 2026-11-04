@@ -1,4 +1,4 @@
-# Assignment: AI TEAM — Team Cognova
+# Assignment: AI(CS24307) TEAM — Cognova
 
 > **Interactive Algorithm Visualizer & Pedagogical Stepping Engine**  
 > *Coursework Assignment & Project Extension: From N-Queens Backtracking to the LeetCode Top Interview 150.*
