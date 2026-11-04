@@ -1,53 +1,147 @@
 # Assignment: AI(CS24307) TEAM — Cognova
 
-> **Interactive Algorithm Visualizer & Pedagogical Stepping Engine**  
-> *Coursework Assignment & Project Extension: From N-Queens Backtracking to the LeetCode Top Interview 150.*
+<div align="center">
+
+### 🎮 [AlgoPlay Live Demo: algoplay-eta.vercel.app](https://algoplay-eta.vercel.app) 🚀
+
+**Interactive Algorithm Visualizer & Pedagogical Stepping Engine**  
+*AI Team Coursework Assignment (N-Queens Backtracking) & Extended Platform (LeetCode Top Interview 150)*
+
+[![Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://algoplay-eta.vercel.app)
+[![Assignment](https://img.shields.io/badge/Assignment-N--Queens%20%2351%20%26%20%2352-FFE600?style=for-the-badge&logo=crown&logoColor=black&labelColor=121212)](https://algoplay-eta.vercel.app/assignment)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2%20App%20Router-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20Mode-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Vitest](https://img.shields.io/badge/Tests-174%2F174%20Passing-00F0A0?style=for-the-badge&logo=vitest&logoColor=black&labelColor=121212)](https://vitest.dev/)
+
+[**🌐 Live Application**](https://algoplay-eta.vercel.app) • [**👑 Direct Assignment Page**](https://algoplay-eta.vercel.app/assignment) • [**📚 Problem Catalog**](https://algoplay-eta.vercel.app/#catalog)
+
+</div>
 
 ---
 
 ## 📌 Table of Contents
 1. [Team Information](#-team-information)
-2. [Coursework Assignment: N-Queens Problem (#51 & #52)](#-coursework-assignment-n-queens-problem-51--52)
-   - [Backtracking & Pruning Logic](#backtracking--pruning-logic)
+2. [Live Deployment](#-live-deployment)
+3. [🎨 Design System: "Neo-Brutalist Doodle & Arcade" Theme](#-design-system-neo-brutalist-doodle--arcade-theme)
+   - [Aesthetic Philosophy](#aesthetic-philosophy)
+   - [Color Palette Tokens](#color-palette-tokens)
+   - [Brutalist Geometry & Tactile Physics](#brutalist-geometry--tactile-physics)
+   - [State-to-Color Pedagogical Mapping](#state-to-color-pedagogical-mapping)
+4. [Coursework Assignment: N-Queens Problem (#51 & #52)](#-coursework-assignment-n-queens-problem-51--52)
+   - [Backtracking & State Space Pruning](#backtracking--state-space-pruning)
    - [Interactive 2D Chessboard Visualizer](#interactive-2d-chessboard-visualizer)
    - [Solving the "1,500-Step" Pedagogical Dilemma (Key Decisions Mode)](#solving-the-1500-step-pedagogical-dilemma-key-decisions-mode)
    - [Interactive Discovered Solutions Gallery](#interactive-discovered-solutions-gallery)
-3. [Project Extension: AlgoPlay (LeetCode Top Interview 150)](#-project-extension-algoplay-leetcode-top-interview-150)
-   - [The Core Philosophy](#the-core-philosophy)
+5. [Project Extension: AlgoPlay (LeetCode Top Interview 150)](#-project-extension-algoplay-leetcode-top-interview-150)
+   - [Core Architecture & Philosophy](#core-architecture--philosophy)
    - [Implemented Problem Categories (44+ Solved)](#implemented-problem-categories-44-solved)
-   - [Multi-Language Synchronized Code Viewer](#multi-language-synchronized-code-viewer)
-4. [Current Project Status: What's In Progress](#-current-project-status-whats-in-progress)
-5. [System Architecture & Tracing Engine](#-system-architecture--tracing-engine)
-6. [Tech Stack](#-tech-stack)
-7. [Player Controls & Keyboard Shortcuts](#-player-controls--keyboard-shortcuts)
-8. [Local Setup & Testing Guide](#-local-setup--testing-guide)
+   - [5-Language Drift-Free Synchronized Code Viewer](#5-language-drift-free-synchronized-code-viewer)
+6. [Roadmap & What's In Progress](#-roadmap--whats-in-progress)
+7. [System Architecture & Tracing Pipeline](#-system-architecture--tracing-pipeline)
+8. [Player Controls & Keyboard Shortcuts](#-player-controls--keyboard-shortcuts)
+9. [Local Development & Testing](#-local-development--testing)
 
 ---
 
 ## 👥 Team Information
 
-* **Team Name:** Team Cognova
+* **Team Name:** Cognova
+* **Course Code:** AI (CS24307)
 * **Project Track:** AI TEAM — Algorithm Animation & Interactive Education Engine
-* **Project Code:** AlgoPlay
-* **Team Members:** RAJ YASH GUPTA (BTECH/15103/24)
-                    VERTIKA (BTECH/15111/24)
-                    ANJALI KUMARI (BTECH/15010/24)
-                    RAM KISHAN MEHTA (BTECH/15016/24)
-                    NISHANT KUMAR (BTECH/15130/24)
+* **Project Code:** AlgoPlay (`algoplay@0.1.0`)
+* **Live Deployment:** [https://algoplay-eta.vercel.app](https://algoplay-eta.vercel.app)
+* **Assignment Direct Route:** [https://algoplay-eta.vercel.app/assignment](https://algoplay-eta.vercel.app/assignment)
+
+### Team Members
+| Name | Roll Number | Role |
+| :--- | :--- | :--- |
+| **RAJ YASH GUPTA** | `BTECH/15103/24` | Core Engine Architecture, Tracing Pipeline & State Machine |
+| **VERTIKA** | `BTECH/15111/24` | Multi-Language Solutions (JS, TS, Python, Java, C++) & Line Maps |
+| **ANJALI KUMARI** | `BTECH/15010/24` | Data Structure Renderers (Grid, Tree, Stack/Queue) |
+| **RAM KISHAN MEHTA** | `BTECH/15016/24` | Test Suite Verification & Benchmarking (Vitest) |
+| **NISHANT KUMAR** | `BTECH/15130/24` | Neo-Brutalist UI Design System, Tokens & Deployment |
+
+---
+
+## 🚀 Live Deployment
+
+The project is deployed and hosted on **Vercel**:
+
+* **Main Application URL:** [https://algoplay-eta.vercel.app](https://algoplay-eta.vercel.app)
+* **N-Queens Assignment Focus:** [https://algoplay-eta.vercel.app/assignment](https://algoplay-eta.vercel.app/assignment) (or click the **👑 N-Queens Assignment** pill in the top navigation bar)
+* **Zero Cold Starts:** Built with the Next.js 14 App Router, dynamic code execution runs in-browser via an isolated Babel AST tracing sandbox with zero external API dependencies.
+
+---
+
+## 🎨 Design System: "Neo-Brutalist Doodle & Arcade" Theme
+
+AlgoPlay rejects sterile, generic corporate dashboards in favor of a signature **Neo-Brutalist Doodle with Retro Arcade Touches** design language.
+
+### Aesthetic Philosophy
+Traditional algorithm visualizers are either overly dry or visually noisy. Our theme combines:
+1. **High-Contrast Neo-Brutalism:** Heavy solid black borders (`2px`–`4px #121212`), high-contrast flat backgrounds, and hard zero-blur offset drop shadows create instantaneous visual clarity.
+2. **Playful Doodle Character:** Hand-drawn parchment textures, expressive badges, and friendly typography turn intimidating LeetCode problems into approachable, interactive puzzle toys.
+3. **Subtle Arcade Touches:** Level progression badges, confetti celebration on problem completion, and arcade-style HUD elements motivate learning without cluttering the visualization itself.
+
+---
+
+### Color Palette Tokens
+All colors, borders, shadows, and typography are governed by a centralized design token system ([tokens.ts](file:///Users/rajyash/projects/algoPlay/src/lib/tokens.ts)):
+
+| Token | Hex | Role & Meaning |
+| :--- | :---: | :--- |
+| **Canvas** | `#FAF7F0` | Warm tactile newsprint background (replaces harsh sterile white) |
+| **Surface** | `#FFFFFF` | Crisp white card surface with hard drop shadows |
+| **Surface Muted** | `#F4EFE6` | Secondary panel backgrounds and code gutters |
+| **Doodle Ink** | `#121212` | Solid black outlines, primary typography, and pointer pills |
+| **Electric Canary** | `#FFE600` | **Primary Brand Color**: Active pointers, inspected cells, play triggers |
+| **Bubblegum Pink** | `#FF5E7E` | **Mutations**: Array swaps, modified elements, backtracked states |
+| **Neo-Cyan** | `#4DEEEA` | **Comparisons**: Evaluated elements, binary search midpoints |
+| **Mint Neon Green** | `#00F0A0` | **Success**: Placed queens, completed targets, valid states |
+| **Tangerine Orange** | `#FFA800` | **Alerts**: Medium difficulty, active ray scanning |
+| **Coral Red** | `#FF3366` | **Danger**: Hard difficulty, attack ray conflicts |
+| **Electric Lavender** | `#B388FF` | **Milestones**: Sliding window brackets, solved configurations |
+
+---
+
+### Brutalist Geometry & Tactile Physics
+* **Zero-Blur Hard Shadows:** Unlike standard blurred CSS shadows, our elements use crisp, comic-style offset shadows:
+  ```css
+  box-shadow: 4px 4px 0px #121212;   /* Standard Card Shadow */
+  box-shadow: 6px 6px 0px #121212;   /* Heavy Modal / Board Shadow */
+  ```
+* **Mechanical Tactile Feedback:** Buttons physically depress into the canvas on interaction:
+  ```css
+  button:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0px #121212; }
+  button:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px #121212; }
+  ```
+* **Heavy Borders:** Consistent `2px solid #121212` up to `4px solid #121212` brutalist outlines on all components, nodes, and boards.
+
+---
+
+### State-to-Color Pedagogical Mapping
+Every data structure renderer shares identical semantic colors:
+* 🟨 **Visited / Current Pointer:** Canary Yellow (`#FFE600`)
+* 🟦 **Compared / Read:** Neo-Cyan (`#4DEEEA`)
+* 🟥 **Modified / Swapped:** Bubblegum Pink (`#FF5E7E`)
+* 🟩 **Settled / Sorted / Target Match:** Mint Neon Green (`#00F0A0`)
+* 🟪 **Sliding Window / Solved Set:** Electric Lavender (`#B388FF`)
 
 ---
 
 ## 👑 Coursework Assignment: N-Queens Problem (#51 & #52)
 
-As part of the core AI coursework, we implemented and deeply animated the classic **N-Queens Puzzle** ([LeetCode #51: N-Queens](https://leetcode.com/problems/n-queens/) and [LeetCode #52: N-Queens II](https://leetcode.com/problems/n-queens-ii/)).
+Direct link: [**algoplay-eta.vercel.app/assignment**](https://algoplay-eta.vercel.app/assignment)
+
+As the focal piece of the AI coursework assignment, we implemented and animated the classic **N-Queens Puzzle** ([LeetCode #51: N-Queens](https://leetcode.com/problems/n-queens/) and [LeetCode #52: N-Queens II](https://leetcode.com/problems/n-queens-ii/)).
 
 ### Problem Summary
-Given an integer $N$, place $N$ queens on an $N \times N$ chessboard such that no two queens attack each other. A queen can attack horizontally, vertically, and diagonally in all 8 directions.
+Given an integer $N$, place $N$ queens on an $N \times N$ chessboard such that no two queens attack each other. A queen can attack horizontally, vertically, and along both diagonals.
 * **#51 (N-Queens):** Return all distinct valid board arrangements.
-* **#52 (N-Queens II):** Return the total count of distinct valid solutions.
+* **#52 (N-Queens II):** Return the total count of distinct valid configurations.
 
 ```
-Sample Solution for N = 4:
+Sample Output for N = 4 (2 Distinct Solutions):
 Solution 1:               Solution 2:
 . Q . .                   . . Q .
 . . . Q                   Q . . .
@@ -55,13 +149,15 @@ Q . . .                   . . . Q
 . . Q .                   . Q . .
 ```
 
-### Backtracking & Pruning Logic
-The solution employs recursive depth-first search (DFS) with state tracking sets:
-* `cols`: Set of columns currently attacked by placed queens.
-* `diag1` ($r - c$): Main diagonal ray indices.
-* `diag2` ($r + c$): Anti-diagonal ray indices.
+---
 
-At each row $r$, the algorithm tests candidate column $c \in [0, N-1]$. If any ray is in conflict, the branch is **pruned immediately**. When $r == N$, a full safe configuration is recorded; otherwise, it backtracks by undoing the placement.
+### Backtracking & State Space Pruning
+The solution executes a recursive depth-first search (DFS) with mathematical state-tracking sets:
+* `cols`: Set of columns occupied by placed queens.
+* `diag1` ($r - c$): Main diagonal ray indices ($N-1$ down to $1-N$).
+* `diag2` ($r + c$): Anti-diagonal ray indices ($0$ up to $2N-2$).
+
+At each row $r$, candidate columns $c \in [0, N-1]$ are inspected. If any ray is in conflict, the branch is **pruned immediately**. When $r == N$, a full safe configuration is recorded; otherwise, it backtracks by undoing the placement.
 
 ```
                      Backtrack Search Tree
@@ -78,12 +174,12 @@ At each row $r$, the algorithm tests candidate column $c \in [0, N-1]$. If any r
 
 ### Interactive 2D Chessboard Visualizer
 
-Rather than a static grid, we engineered a dedicated **`GridRenderer`** for board games and 2D arrays:
+The dedicated **`GridRenderer`** turns abstract recursion into an intuitive board game:
 1. **8-Direction Attack Rays:** When candidate square $(r, c)$ is evaluated, the visualizer casts soft amber attack rays along its row, column, and both diagonals to illustrate queen sightlines.
 2. **Real-time Conflict Crosshairs:**
-   *  **Attacked Square:** Displays animated coral crosshairs with an alert badge (`⚔️ Conflict at (r, c)`) showing exactly which diagonal/column is threatened.
-   *  **Safe Square:** Highlights in vibrant yellow with (`✓ Testing (r, c)`).
-3. **Framer Motion Spring Physics:** Queens animate into position with spring bounce and rotation, and exit smoothly during backtracking.
+   * ⚔️ **Attacked Square:** Displays animated coral crosshairs with an alert badge (`⚔️ Conflict at (r, c)`) indicating which ray is threatened.
+   * ✓ **Safe Square:** Highlights in vibrant yellow with (`✓ Testing (r, c)`).
+3. **Framer Motion Spring Physics:** Queens pop onto the board with dynamic spring rotation, and gracefully exit during backtracking.
 4. **Zoom & Pan Controls:** Built-in zoom controls (65% to 140%) to handle both small boards ($N=4$) and larger boards ($N=8+$).
 
 ---
@@ -118,7 +214,7 @@ At the bottom of the chessboard, discovered solutions are rendered in real time 
 
 Building on the N-Queens engine, we extended the application into **AlgoPlay**: a full-scale algorithm visualizer for the **LeetCode Top Interview 150**.
 
-### The Core Philosophy
+### Core Architecture & Philosophy
 1. **Separation of Concerns:** Solution algorithms never draw directly. Solutions run in plain JavaScript and record an immutable execution trace composed of `Step` snapshots.
 2. **Reusable Data Structure Renderers:** Renderers are built per *data structure*, not per problem:
    * **`ArrayRenderer`:** 1D array visualization with multi-pointer tracking (`left`, `right`, `slow`, `fast`), sliding windows, and bar heights.
@@ -131,7 +227,7 @@ Building on the N-Queens engine, we extended the application into **AlgoPlay**: 
 
 ### Implemented Problem Categories (44+ Solved)
 
-| Category | Count | Sample Problems Included | Renderers Used |
+| Category | Problems | Sample Problems Included | Active Renderer |
 | :--- | :---: | :--- | :--- |
 | **Backtracking (Assignment)** | 2 | #51 N-Queens, #52 N-Queens II | `GridRenderer` |
 | **Array & Two Pointers** | 5 | Two Sum, Two Sum II, Valid Palindrome, Best Time to Buy/Sell Stock, Search Insert Position | `ArrayRenderer` |
@@ -143,34 +239,35 @@ Building on the N-Queens engine, we extended the application into **AlgoPlay**: 
 
 ---
 
-### Multi-Language Synchronized Code Viewer
+### 5-Language Drift-Free Synchronized Code Viewer
 
 Every problem in AlgoPlay features clean code implementations across **5 major programming languages**:
-1. **JavaScript** (traced & executed)
+1. **JavaScript** (traced & executed in-engine)
 2. **TypeScript**
 3. **Python**
 4. **Java**
 5. **C++**
 
-#### Synchronized Line Mapping
+#### Drift-Free Line Mapping
 * Internal engine hooks (such as `note(...)`) are stripped from display code.
 * A line-mapping table (`rawToDisplayLine`) keeps the active line highlighted simultaneously across all 5 languages without drifting, verified by automated test suites.
 
 ---
 
-## 🚧 Current Project Status: What's In Progress
+## 🚧 Roadmap & What's In Progress
 
-AlgoPlay is structured in iterative phases:
+AlgoPlay is built in modular phases:
 
-* [x] **Phase 1: Foundation & Arrays** *(Completed)*
-  * AST Babel transformation engine, Web Worker execution isolation, and `ArrayRenderer`.
-  * Top LeetCode Array & Two-Pointer problems with multi-language line mapping.
-* [x] **Phase 2: Pointer, Tree, Stack & Backtracking Structures** *(Completed)*
-  * Node ID registry for persistent object graph identity across time steps.
+* [x] **Phase 1: Core Engine & Array/Two Pointers** *(Completed & Shipped)*
+  * Babel AST transformation pipeline, immutable state snapshots, and `ArrayRenderer`.
+  * Top LeetCode Array & Two-Pointer problems with multi-language line maps.
+* [x] **Phase 2: Pointer, Tree, Stack & Backtracking Structures** *(Completed & Shipped)*
+  * Node ID registry for permanent object graph identities across steps.
   * `LinkedListRenderer`, `TreeRenderer`, `StackQueueRenderer`, and `GridRenderer`.
   * 37+ LeetCode problems across Stack, Linked List, Tree BFS/DFS, BST, and N-Queens.
-  * Dual-mode stepping (**Key Decisions Mode** + **Micro-step Mode**).
-* [ ] **Phase 3: Graphs, Dynamic Programming & Custom Problem Generator** *(In Progress 🚧)*
+  * **Key Decisions Mode** (filtering 1,505 steps $\rightarrow$ 232 moves) + quick solution jumps.
+  * Production deployment to Vercel: [algoplay-eta.vercel.app](https://algoplay-eta.vercel.app).
+* [ ] **Phase 3: Graphs, Dynamic Programming & Custom Code Generator** *(In Progress 🚧)*
   * **`GraphRenderer`:** Adjacency list and matrix visualizations with cycle detection and topological sort.
   * **`DPRenderer`:** 2D dynamic programming grid table with memoization state transitions.
   * **`IntervalRenderer`:** 1D range timelines for interval scheduling and merging.
@@ -178,7 +275,7 @@ AlgoPlay is structured in iterative phases:
 
 ---
 
-## 🏗 System Architecture & Tracing Engine
+## 🏗 System Architecture & Tracing Pipeline
 
 ```
 [ Problem Input ]
@@ -201,64 +298,41 @@ AlgoPlay is structured in iterative phases:
 
 ---
 
-## 💻 Tech Stack
-
-* **Framework:** [Next.js 14](https://nextjs.org/) (App Router, React 18)
-* **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict mode, zero `any` tolerance)
-* **Styling:** [Tailwind CSS](https://tailwindcss.com/) with centralized Neo-brutalist design tokens
-* **Animations:** [Framer Motion](https://www.framer.com/motion/) (Spring physics, pop layouts)
-* **State Management:** [Zustand](https://github.com/pmndrs/zustand)
-* **AST Parsing & Code Gen:** [@babel/parser](https://babel.dev/), `@babel/traverse`, `@babel/generator`
-* **Icons:** [Lucide React](https://lucide.dev/)
-* **Testing:** [Vitest](https://vitest.dev/) (174 unit and integration tests passing)
-
----
-
 ## 🎮 Player Controls & Keyboard Shortcuts
 
-| Shortcut | Action | Description |
+| Key / Control | Action | Function |
 | :---: | :--- | :--- |
-| <kbd>Space</kbd> | **Play / Pause** | Toggles continuous playback |
+| <kbd>Space</kbd> | **Play / Pause** | Toggles continuous animated playback |
 | <kbd>→</kbd> | **Step Forward** | Moves forward by 1 step (or 1 key decision) |
 | <kbd>←</kbd> | **Step Backward** | Moves backward by 1 step (or 1 key decision) |
 | <kbd>Shift</kbd> + <kbd>→</kbd> | **Next Decision** | Jumps directly to next queen placement/backtrack |
 | <kbd>Shift</kbd> + <kbd>←</kbd> | **Prev Decision** | Jumps directly to previous queen placement/backtrack |
 | <kbd>K</kbd> | **Toggle Key Steps** | Toggles between Key Decisions Mode and All Code Lines |
 | <kbd>R</kbd> | **Restart** | Resets playback to Step 0 |
-| **Slider** | **Speed Control** | Smooth speed adjustment from 0.10x (slow) to 1.00x |
+| **Slider** | **Speed Control** | Continuous speed adjustment from 0.10x (slow) to 1.00x |
+| **Card Click** | **Jump to Solution** | Snaps to any discovered solution configuration instantly |
 
 ---
 
-## 🛠 Local Setup & Testing Guide
+## 💻 Local Development & Testing
 
-### Prerequisites
-* Node.js 18.x or 20.x
-* npm 9+ or pnpm / yarn
+While the app is deployed live at [algoplay-eta.vercel.app](https://algoplay-eta.vercel.app), you can also run it locally:
 
-### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/<YOUR_GITHUB_USERNAME>/algoPlay.git
+git clone https://github.com/rajyash-17/algoPlay.git
 cd algoPlay
 
 # Install dependencies
 npm install
-```
 
-### Running Locally
-```bash
+# Run the local development server
 npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-* Access the assignment directly at: [http://localhost:3000/assignment](http://localhost:3000/assignment)
-* Or browse all problems from the homepage directory.
 
-### Running Verification Tests
-```bash
-# Run unit & trace integration tests (174 tests)
+# Run all 174 test suites
 npm test
 
-# Run strict TypeScript typecheck
+# Verify strict TypeScript types (zero errors, no any)
 npm run typecheck
 
 # Build for production
@@ -267,4 +341,8 @@ npm run build
 
 ---
 
-*Authored by Team Cognova — AI Team Coursework Assignment & Extended Project.*
+<div align="center">
+  <b>Team Cognova — AI (CS24307) Coursework Assignment & Extended Platform</b><br />
+  Built with Next.js 14, TypeScript, Tailwind, Framer Motion, Zustand & Babel AST Tracing.<br />
+  <a href="https://algoplay-eta.vercel.app"><b>algoplay-eta.vercel.app</b></a>
+</div>
