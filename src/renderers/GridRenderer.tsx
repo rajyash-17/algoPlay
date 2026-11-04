@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Step, RendererConfig, GridStructureSnapshot, Snapshot } from '@/engine/types';
 import { LayoutGrid, Crown, ZoomIn, ZoomOut, Trophy, Crosshair, AlertTriangle, CheckCircle } from 'lucide-react';
+import { usePlayerStore } from '@/lib/playerStore';
 
 interface GridRendererProps {
   step: Step | null;
@@ -114,6 +115,18 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
     }
     return null;
   }, [step.vars]);
+
+  const { steps, goToStep } = usePlayerStore();
+
+  // Find the exact step index where each solution was first added
+  const solutionStepIndices = useMemo(() => {
+    if (!solutionsList) return [];
+    return solutionsList.map((_, idx) => {
+      return steps.findIndex(
+        (s) => Array.isArray(s.vars.solutions) && s.vars.solutions.length > idx
+      );
+    });
+  }, [solutionsList, steps]);
 
   const targetQueens = Math.max(numRows, numCols);
   const isFullBoard = queensCount === targetQueens;
@@ -383,14 +396,33 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 ? sol.map((l) => (Array.isArray(l) ? l.join('') : String(l)))
                 : [];
 
+              const targetStep = solutionStepIndices[solIdx];
+              const isClickable = typeof targetStep === 'number' && targetStep >= 0;
+
               return (
-                <div
+                <button
                   key={solIdx}
-                  className="flex flex-col items-center bg-surface-muted p-2 rounded-lg border-2 border-ink shadow-xs"
+                  onClick={() => {
+                    if (isClickable) {
+                      goToStep(targetStep);
+                    }
+                  }}
+                  title={
+                    isClickable
+                      ? `Click to jump to Solution #${solIdx + 1} (Step ${targetStep + 1})`
+                      : `Solution #${solIdx + 1}`
+                  }
+                  className="flex flex-col items-center bg-surface-muted hover:bg-primary/20 p-2 rounded-lg border-2 border-ink shadow-xs hover:shadow-standard transition-all cursor-pointer group text-left"
                 >
-                  <span className="font-mono text-[10px] font-black text-ink mb-1">
-                    Solution #{solIdx + 1}
-                  </span>
+                  <div className="flex items-center gap-1.5 mb-1.5 w-full justify-between">
+                    <span className="font-mono text-[10px] font-black text-ink">
+                      Sol #{solIdx + 1}
+                    </span>
+                    <span className="text-[9px] font-mono font-bold text-ink-muted group-hover:text-ink flex items-center gap-0.5">
+                      <span>Jump</span>
+                      <span>↗</span>
+                    </span>
+                  </div>
                   <div className="flex flex-col border border-ink rounded overflow-hidden">
                     {solLines.map((line, rIdx) => (
                       <div key={rIdx} className="flex">
@@ -415,7 +447,7 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                       </div>
                     ))}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
